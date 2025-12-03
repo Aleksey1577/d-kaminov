@@ -40,6 +40,7 @@
         }
     </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="yandex-verification" content="0f294fee5b68e1a0" />
 </head>
 
 <body class="font-sans antialiased bg-gray-100 min-h-screen flex flex-col"
@@ -67,7 +68,7 @@
                 <div x-data="{ isOpen: false }" class="relative">
                     <button
                         @click="isOpen = !isOpen"
-                        class="bg-orange text-white px-4 py-2 rounded hover:bg-blue-700 hidden md:block focus:outline-none">
+                        class="bg-orange text-white px-4 py-2 rounded hover:bg-orange-white hidden md:block focus:outline-none">
                         Каталог
                         <svg class="w-4 h-4 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -140,8 +141,8 @@
 
             <!-- Контакты и Заказать звонок -->
             <div class="hidden md:inline-flex items-center space-x-4">
-                <a href="tel:+79198055747" class="text-gray-700 font-semibold underline">
-                    +7 (919) 805-57-47
+                <a href="tel:+79179535850" class="text-gray-700 font-semibold underline">
+                    +7 (917) 953-58-50
                 </a>
                 <button @click="$dispatch('open-callback')" class="px-4 py-2 hover:underline">
                     Заказать звонок
@@ -215,7 +216,7 @@
                 <!-- Контакты -->
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Контакты</h3>
-                    <p>Телефон: <a href="tel:+79198055747" class="hover:text-orange">+7 (919) 805-57-47</a></p>
+                    <p>Телефон: <a href="tel:+79179535850" class="hover:text-orange">+7 (917) 953-58-50</a></p>
                     <p>Email: <a href="mailto:info@d-kaminov.com" class="hover:text-orange">info@d-kaminov.com</a></p>
                 </div>
 
@@ -233,7 +234,7 @@
             <!-- Блок с политикой и копирайтом -->
             <div class="mt-8 pt-6 border-t border-gray-700 flex justify-between text-sm">
                 <p>
-                    © 2025 D-Kaminov. Все права защищены.
+                    ©2010-2026 D-Kaminov. Все права защищены.
                 </p>
                 <p>
                     <a href="{{ route('privacy.policy') }}" class="hover:text-orange">

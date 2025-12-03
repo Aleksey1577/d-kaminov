@@ -47,7 +47,7 @@
 
             </div>
             <div class=" p-4 rounded-lg shadow-md bg-white flex-1 text-center">
-                <p class="text-lg font-semibold text-gray-800">Банковский перевод</p>
+                <p class="text-lg font-semibold text-gray-800">Безналичный расчет</p>
                 <p className="mt-2 text-gray-600">Оплата по реквизитам</p>
 
             </div>

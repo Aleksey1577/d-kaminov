@@ -3,6 +3,15 @@
 @section('title', 'Главная админки')
 
 @section('content')
+    {{-- ссылка на сайт --}}
+    <div class="mb-4">
+        <span class="text-sm text-gray-500 mr-1">Сайт:</span>
+        <a href="{{ url('/') }}" target="_blank"
+           class="text-orange font-semibold hover:underline">
+            {{ config('app.name', 'Перейти на сайт') }}
+        </a>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="bg-white shadow-md rounded-lg p-6">
             <h2 class="text-lg font-semibold">Всего заказов</h2>
@@ -50,7 +59,9 @@
                             <td class="border p-3">{{ ucfirst($order->status) }}</td>
                             <td class="border p-3">{{ $order->created_at->format('d.m.Y H:i') }}</td>
                             <td class="border p-3">
-                                <a href="{{ route('admin.orders.show', $order) }}" class="text-blue-600 hover:underline">Посмотреть</a>
+                                <a href="{{ route('admin.orders.show', $order) }}" class="text-blue-600 hover:underline">
+                                    Посмотреть
+                                </a>
                             </td>
                         </tr>
                     @empty

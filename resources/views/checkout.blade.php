@@ -77,8 +77,8 @@
                         <!-- Блок самовывоза -->
                         <div x-show="pickupType === 'pickup'" class="bg-gray-50 p-4 rounded-md mb-4">
                             <p class="font-medium">Наш магазин:</p>
-                            <p class="text-gray-600">ул. Примерная, д. 123</p>
-                            <p class="text-gray-600">Тел: +7 (800) 123-45-67</p>
+                            <p class="text-gray-600">ТЦ Интермебель, Московское шоссе 16 км, 1в ст2, 2 этаж</p>
+                            <p class="text-gray-600">Тел: +7 (917) 953-58-50</p>
                         </div>
 
                         <!-- Поле адреса доставки -->

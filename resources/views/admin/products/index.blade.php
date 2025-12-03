@@ -12,7 +12,11 @@
         <!-- Поиск -->
         <form method="GET" action="{{ route('admin.products') }}" class="mb-6">
             <div class="flex space-x-4">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Поиск по названию..." class="w-full border rounded px-3 py-2">
+                <input type="text"
+                       name="search"
+                       value="{{ request('search') }}"
+                       placeholder="Поиск по названию или артикулу..."
+                       class="w-full border rounded px-3 py-2">
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Найти</button>
             </div>
         </form>
@@ -24,7 +28,8 @@
                 <table class="min-w-full border-collapse">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="border p-3 text-left">ID</th>
+                            <th class="border p-3 text-left">product_id</th>
+                            <th class="border p-3 text-left">SKU</th>
                             <th class="border p-3 text-left">Название</th>
                             <th class="border p-3 text-left">Цена</th>
                             <th class="border p-3 text-left">Категория</th>
@@ -34,9 +39,10 @@
                     <tbody>
                         @foreach ($products as $product)
                             <tr class="hover:bg-gray-50">
-                                <td class="border p-3">{{ $product->id }}</td>
+                                <td class="border p-3">{{ $product->product_id }}</td>
+                                <td class="border p-3">{{ $product->sku }}</td>
                                 <td class="border p-3">{{ $product->naimenovanie }}</td>
-                                <td class="border p-3">{{ number_format($product->price, 2) }} ₽</td>
+                                <td class="border p-3">{{ number_format($product->price, 2, ',', ' ') }} ₽</td>
                                 <td class="border p-3">{{ $product->kategoriya }}</td>
                                 <td class="border p-3 space-x-2">
                                     <a href="{{ route('admin.products.edit', $product) }}" class="text-blue-600 hover:underline">Редактировать</a>
@@ -51,7 +57,9 @@
                     </tbody>
                 </table>
             </div>
-            {{ $products->links() }}
+            <div class="mt-4">
+                {{ $products->links() }}
+            </div>
         @endif
     </div>
 @endsection

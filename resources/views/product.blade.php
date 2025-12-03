@@ -1,4 +1,4 @@
-{{--  /resources/views/product.blade.php  --}}
+{{-- resources/views/product.blade.php --}}
 
 @extends('layouts.app')
 
@@ -11,26 +11,32 @@
     <!-- JSON-LD структурированные данные -->
     @include('components.seo.product-json-ld', ['product' => $product])
 
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex flex-wrap lg:flex-nowrap justify-between gap-8">
-            <!-- Компонент с картинками (шире) -->
-            <div class="flex-1 lg:w-1/2">
+    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+        <div class="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-10">
+            <!-- Компонент с картинками -->
+            <div class="w-full lg:w-1/2">
                 <x-product-images :product="$product" />
             </div>
 
             <!-- Компонент с характеристиками и ценой -->
-            <div class="flex-1 lg:w-1/2">
-                <div class="flex justify-between">
-                    <!-- Компонент с характеристиками -->
-                    <x-short-characteristics :product="$product" />
+            <div class="w-full lg:w-1/2">
+                <div class="flex flex-col-reverse lg:flex-row lg:items-start gap-6">
+                    <!-- Краткие характеристики (слева на десктопе, ниже цены на мобиле) -->
+                    <div class="lg:w-1/2">
+                        <x-short-characteristics :product="$product" />
+                    </div>
 
-                    <!-- Компонент с ценой и кнопкой "В корзину" -->
-                    <x-product-price :product="$product" :variants="$variants" />
+                    <!-- Цена и кнопка "В корзину" (справа на десктопе, выше характеристик на мобиле) -->
+                    <div class="lg:w-1/2">
+                        <x-product-price :product="$product" :variants="$variants" />
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Табы -->
-        <x-product-tabs :product="$product" />
+        <div class="mt-6">
+            <x-product-tabs :product="$product" />
+        </div>
     </div>
 @endsection

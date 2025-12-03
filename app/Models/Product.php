@@ -12,26 +12,36 @@ class Product extends Model
 
     protected $primaryKey = 'product_id';
 
-    protected $fillable = [
-        'product_id', 'naimenovanie', 'price', 'image_url', 'kategoriya', 'v_nalichii_na_sklade',
-        'opisanije', 'sku', 'proizvoditel', 'price2', 'material', 'vysota', 'shirina', 'glubina',
-        'ves', 'tsvet', 'garantiya', 'image_url_1', 'image_url_2', 'image_url_3', 'tip_stroki'
-    ];
+    /**
+     * Так как мы валидируем все поля в контроллере и массово заполняем модель,
+     * проще и безопаснее разрешить всё:
+     */
+    protected $guarded = [];
 
     protected $appends = ['slug'];
 
-    public function getSlugAttribute()
+    /*
+     * Слаг: название + product_id, используется в URL
+     */
+    public function getSlugAttribute(): string
     {
         return Str::slug($this->naimenovanie) . '-' . $this->product_id;
     }
 
+    /*
+     * Варианты товара (строки с tip_stroki = 'variant')
+     * Логика может быть адаптирована под твою схему.
+     */
     public function variants()
     {
         return $this->hasMany(Product::class, 'product_id', 'product_id')
-                    ->where('tip_stroki', 'variant');
+            ->where('tip_stroki', 'variant');
     }
-    
-    public function getShortCharacteristics()
+
+    /*
+     * Короткие характеристики для карточки товара
+     */
+    public function getShortCharacteristics(): array
     {
         $characteristics = [];
 
@@ -51,48 +61,75 @@ class Product extends Model
             $characteristics['Материал'] = $this->material;
         }
 
-        // Ограничьте до 5 характеристик
+        // Ограничиваем до 5 характеристик
         return array_slice($characteristics, 0, 5);
     }
 
-    public function getFullCharacteristics()
+    /*
+     * ==========================
+     *  Переводы / лейблы полей
+     * ==========================
+     */
+
+    /**
+     * Все "человеческие" лейблы для технических полей
+     * берём из config/product.php.
+     */
+    public static function extraLabels(): array
     {
-        // Маппинг полей на русские названия
-        $fieldMap = [
-            'naimenovanie' => 'Наименование',
-            'price' => 'Цена',
-            'image_url' => 'Изображение',
-            'kategoriya' => 'Категория',
-            'v_nalichii_na_sklade' => 'В наличии',
-            'opisanije' => 'Описание',
-            'sku' => 'Артикул',
+        return config('product.extra_labels', []);
+    }
+
+    /**
+     * Получить подпись для конкретного поля.
+     * Если в конфиге нет — делаем что-то вроде "Tolshchina Materiala" → "Tolshchina Materiala".
+     */
+    public static function labelFor(string $field): string
+    {
+        $labels = static::extraLabels();
+
+        if (isset($labels[$field])) {
+            return $labels[$field];
+        }
+
+        return Str::of($field)->replace('_', ' ')->headline();
+    }
+
+    /*
+     * Полный набор характеристик для страницы товара.
+     * Использует те же лейблы, что и формы create/edit.
+     */
+    public function getFullCharacteristics(): array
+    {
+        $map = static::extraLabels();
+
+        // При желании можно сюда же добавить базовые поля, если нужно:
+        $base = [
             'proizvoditel' => 'Производитель',
-            'price2' => 'Цена 2',
-            'material' => 'Материал',
-            'vysota' => 'Высота',
-            'shirina' => 'Ширина',
-            'glubina' => 'Глубина',
-            'ves' => 'Вес',
-            'tsvet' => 'Цвет',
-            'garantiya' => 'Гарантия',
-            'image_url_1' => 'Изображение 1',
-            'image_url_2' => 'Изображение 2',
-            'image_url_3' => 'Изображение 3',
+            'strana'       => 'Страна производства',
+            'garantiya'    => 'Гарантия',
+            'valyuta'      => 'Валюта',
+            'toplivo'      => 'Топливо',
+            'tip_tovara'   => 'Тип товара',
         ];
 
-        // Получаем все атрибуты
-        $attributes = $this->toArray();
-
-        // Исключаем служебные поля
-        $excludedFields = ['product_id', 'naimenovanie', 'opisanije', 'price', 'valyuta', 'supplier_sku', 'postavshik', 'image_url', 'image_url_1', 'image_url_2', 'image_url_3', 'image_url_4', 'image_url_5', 'image_url_6', 'image_url_7', 'image_url_8', 'image_url_9', 'image_url_10', 'image_url_11', 'image_url_12', 'image_url_13', 'image_url_14', 'image_url_15', 'image_url_16', 'image_url_17', 'image_url_18', 'image_url_19', 'image_url_20', 'price2', 'seo_title', 'seo_description',  'tip_stroki', 'created_at', 'updated_at', 'id', 'slug'];
-
-        $characteristics = [];
-        foreach ($attributes as $key => $value) {
-            if (!in_array($key, $excludedFields) && isset($fieldMap[$key]) && !empty($value)) {
-                $characteristics[$fieldMap[$key]] = $value;
+        // Базовые добавляем в начало, не перезаписывая, если уже есть в extra_labels
+        foreach ($base as $field => $label) {
+            if (!isset($map[$field])) {
+                $map[$field] = $label;
             }
         }
 
-        return $characteristics;
+        $result = [];
+
+        foreach ($map as $field => $label) {
+            $value = $this->{$field} ?? null;
+
+            if ($value !== null && trim((string) $value) !== '') {
+                $result[$label] = $value;
+            }
+        }
+
+        return $result;
     }
 }

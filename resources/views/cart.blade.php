@@ -14,7 +14,7 @@
 @if($cartIsEmpty)
     <div class="bg-white p-6 rounded shadow text-center">
         <p class="text-gray-600 mb-4">Ваша корзина пуста.</p>
-        <a href="{{ route('catalog') }}" class="inline-block px-6 py-3 bg-orange text-white rounded hover:bg-orange-700 transition">
+        <a href="{{ route('catalog') }}" class="inline-block px-6 py-3 bg-orange text-white rounded hover:bg-orange-white transition">
             Перейти в каталог
         </a>
     </div>

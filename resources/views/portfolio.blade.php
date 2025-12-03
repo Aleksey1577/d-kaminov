@@ -10,7 +10,7 @@
         <h1 class="text-3xl font-bold text-gray-800 mb-4">Наши работы</h1>
         <p class="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
             Мы гордимся каждым проектом — от уютных дачных печей до премиальных каминов в элитных коттеджах.
-            <span class="text-orange font-semibold">Более 150 установок</span> по Самаре, Тольятти и области.
+            <span class="text-orange font-semibold">Более 550 установок</span> по Самаре, Тольятти и области.
             Все работы выполнены <span class="font-medium">под ключ</span>: от проектирования до запуска с гарантией 3 года.
         </p>
     </header>

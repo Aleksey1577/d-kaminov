@@ -3,6 +3,15 @@
 @section('title', 'Главная админки')
 
 @section('content')
+    {{-- ссылка на сайт --}}
+    <div class="mb-2">
+        <span class="text-sm text-gray-500 mr-1">Сайт:</span>
+        <a href="{{ url('/') }}" target="_blank"
+           class="text-orange font-semibold hover:underline">
+            {{ config('app.name', 'Перейти на сайт') }}
+        </a>
+    </div>
+
     <h1 class="text-2xl font-bold mb-6">Добро пожаловать, {{ auth()->user()->name }}</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

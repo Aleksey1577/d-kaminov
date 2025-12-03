@@ -259,7 +259,7 @@
 
                 {{-- Кнопка Применить --}}
                 <button type="submit"
-                    class="w-full bg-orange text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                    class="w-full bg-orange text-white px-4 py-2 rounded hover:bg-orange-white transition">
                     Применить
                 </button>
             </div>
