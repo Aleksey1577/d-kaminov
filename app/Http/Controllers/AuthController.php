@@ -21,19 +21,17 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // Проверка на админа по is_admin
             if (Auth::user()->is_admin) {
                 return redirect()->intended('/admin');
             }
 
-            // Обычный пользователь — в личный кабинет
             return redirect()->intended('/profile');
         }
 
@@ -51,29 +49,37 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'name'                  => ['required', 'string', 'max:255'],
+            'email'                 => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password'              => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
         $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
+            'name'     => $data['name'],
+            'email'    => $data['email'],
             'password' => Hash::make($data['password']),
-            'is_admin' => false,  // По умолчанию не админ
+            'is_admin' => false,
         ]);
 
         Auth::login($user);
 
-        // После регистрации — в личный кабинет
         return redirect('/profile');
     }
 
     public function profile()
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
-        $categories = $this->getCategories();
-        return view('profile', compact('user', 'categories'));
+
+        $categories      = $this->getCategories();
+        $favorites       = session('favorites', []);
+        $compare         = session('compare', []);
+        $favoritesCount  = is_array($favorites) ? count($favorites) : 0;
+        $compareCount    = is_array($compare) ? count($compare) : 0;
+
+        $orders = method_exists($user, 'orders') ? $user->orders()->latest()->get() : collect();
+
+        return view('profile', compact('user', 'categories', 'favoritesCount', 'compareCount', 'orders'));
     }
 
     public function logout(Request $request)
@@ -87,11 +93,13 @@ class AuthController extends Controller
     public function updateProfile(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name'  => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . Auth::id()],
         ]);
 
-        Auth::user()->update($validated);
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $user->fill($validated)->save();
 
         return back()->with('success', 'Профиль обновлён');
     }

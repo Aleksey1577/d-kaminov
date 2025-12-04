@@ -9,20 +9,20 @@ class HomeController extends Controller
 {
     use CommonDataTrait;
 
-    public function index(SeoService $seo)
+    public function index(\App\Services\SeoService $seo)
     {
-        $seoData = $seo->getPage('home');
-        $categories = $this->getCategories();
-        $cartQuantity = $this->getCartQuantity();
-        $compareCount = $this->getUserCompareCount();
+        $seoData        = $seo->getPage('home');
+        $categories    = $this->getCategories();
+        $cartQuantity  = $this->getCartQuantity();
+        $compareCount  = $this->getUserCompareCount();
         $favoritesCount = $this->getUserFavoritesCount();
 
-        return view('welcome', compact(
-            'seoData',
+        return view('home', compact(
+            'seoData', 
             'categories',
             'cartQuantity',
             'compareCount',
             'favoritesCount'
-        ));
+        ))->with('seo', $seo);
     }
 }

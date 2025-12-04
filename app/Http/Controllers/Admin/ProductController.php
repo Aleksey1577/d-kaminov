@@ -12,21 +12,63 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
+        // валидируем входные фильтры (GET)
+        $filters = $request->validate([
+            'search'         => 'nullable|string|max:255',
+            'kategoriya'     => 'nullable|string|max:255',
+            'postavshik'     => 'nullable|string|max:255',
+            'proizvoditel'   => 'nullable|string|max:255',
+            'price_min'      => 'nullable|numeric|min:0',
+            'price_max'      => 'nullable|numeric|min:0',
+        ]);
+
         $query = Product::query();
 
-        if ($request->filled('search')) {
-            $search = $request->input('search');
+        // Поиск (название/sku)
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('naimenovanie', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%");
+                    ->orWhere('sku', 'like', "%{$search}%");
             });
+        }
+
+        // Фильтры по равенству
+        if (!empty($filters['kategoriya'])) {
+            $query->where('kategoriya', $filters['kategoriya']);
+        }
+        if (!empty($filters['postavshik'])) {
+            $query->where('postavshik', $filters['postavshik']);
+        }
+        if (!empty($filters['proizvoditel'])) {
+            $query->where('proizvoditel', $filters['proizvoditel']);
+        }
+
+        // Фильтр по цене (min/max, можно указывать один из них)
+        $min = $filters['price_min'] ?? null;
+        $max = $filters['price_max'] ?? null;
+
+        if ($min !== null && $max !== null) {
+            if ($min > $max) {
+                [$min, $max] = [$max, $min]; // авто-перестановка, если перепутали
+            }
+            $query->whereBetween('price', [$min, $max]);
+        } elseif ($min !== null) {
+            $query->where('price', '>=', $min);
+        } elseif ($max !== null) {
+            $query->where('price', '<=', $max);
         }
 
         $products = $query->orderByDesc('product_id')
             ->paginate(50)
             ->withQueryString();
 
-        return view('admin.products.index', compact('products'));
+        // Справочники для селектов
+        $categories    = $this->getDistinctValues('kategoriya');
+        $suppliers     = $this->getDistinctValues('postavshik');
+        $manufacturers = $this->getDistinctValues('proizvoditel');
+
+        return view('admin.products.index', compact('products', 'categories', 'suppliers', 'manufacturers'));
     }
 
     public function create()
@@ -161,28 +203,97 @@ class ProductController extends Controller
 
         // куча nullable string(255)
         $nullable255 = [
-            'naimenovanie_artikula','opisanije','valyuta','tip_tovara',
-            'sku','supplier_sku','postavshik','proizvoditel','strana','garantiya',
-            'vysota','shirina','glubina','ves','tsvet','material','tolshchina_materiala','gabarity',
-            'toplivo','kolichestvo_konteynerov','obshchaya_liniya_ognya',
-            'vysota_vstraivayemaya','shirina_vstraivayemaya','glubina_vstraivayemaya',
-            'maksimalnoe_vremya_goreniya','seriya_kaminov','raskhod_biotopliva','material_tb',
-            'tip_biokamina','tolshchina_ochaga','tolshchina_kryshki_toplivnogo_bloka','seriya_toplivnogo_bloka',
-            'obshchiy_razmer_tb','obem_toplivnogo_bloka','obem_zalivaemogo_topliva','klass_rashoda_biotopliva',
-            'vid_ognya','tolshchina_stekla','material_ochaga',
-            'kolichestvo_rezhimov_ognya','tip_upravleniya','sposob_upravleniya',
-            'maksimalnaya_potrebljayemaya_moshchnost','tip_gaza',
-            'nominalnoe_vkhodnoe_davlenie','minimalnoe_vkhodnoe_davlenie','maksimalnoe_vkhodnoe_davlenie',
-            'avtomaticheskoe_upravlenie','tip_ustroystva','shirina_dveri','vysota_dveri',
-            'diametr_dymokhoda','prisoyedinenie_dymokhoda','forma_stekla_i_dverey','moshchnost',
-            'maksimalnaya_dlinna_drov','kpd','sposob_otkrytiya_dvertsy','nalichie_dymosbornika',
-            'futerovka','nalichie_zolnika','teplooobmenik','moshchnost_teplooobmenika','tip_dverki',
-            'podacha_vozdushka_izvne','raspolozhenie_v_pomeshchenii','dizayn_i_ispolnenie','material_oblitcovki',
-            'tip_nagrevanija','optsii_kaminov_i_pechey','vysota_kaminokomplekta','nalichie_balki',
-            'three_d','vtorichnyy_dozhig','sistema_chistogo_stekla','klass_energoemkosti',
-            'rezerv3','tekhnologiya_plameni','tip_ochaga','obem','moshchnost_obogreva','pult_du',
-            'otlichitelnye_osobennosti','optsii','tsvet_ochaga','tsvet_dereva','tsvet_kamnya',
-            'material_korpusa','rezerv','diametr_dymokhoda_dymokhody','rezerv1',
+            'naimenovanie_artikula',
+            'opisanije',
+            'valyuta',
+            'tip_tovara',
+            'sku',
+            'supplier_sku',
+            'postavshik',
+            'proizvoditel',
+            'strana',
+            'garantiya',
+            'vysota',
+            'shirina',
+            'glubina',
+            'ves',
+            'tsvet',
+            'material',
+            'tolshchina_materiala',
+            'gabarity',
+            'toplivo',
+            'kolichestvo_konteynerov',
+            'obshchaya_liniya_ognya',
+            'vysota_vstraivayemaya',
+            'shirina_vstraivayemaya',
+            'glubina_vstraivayemaya',
+            'maksimalnoe_vremya_goreniya',
+            'seriya_kaminov',
+            'raskhod_biotopliva',
+            'material_tb',
+            'tip_biokamina',
+            'tolshchina_ochaga',
+            'tolshchina_kryshki_toplivnogo_bloka',
+            'seriya_toplivnogo_bloka',
+            'obshchiy_razmer_tb',
+            'obem_toplivnogo_bloka',
+            'obem_zalivaemogo_topliva',
+            'klass_rashoda_biotopliva',
+            'vid_ognya',
+            'tolshchina_stekla',
+            'material_ochaga',
+            'kolichestvo_rezhimov_ognya',
+            'tip_upravleniya',
+            'sposob_upravleniya',
+            'maksimalnaya_potrebljayemaya_moshchnost',
+            'tip_gaza',
+            'nominalnoe_vkhodnoe_davlenie',
+            'minimalnoe_vkhodnoe_davlenie',
+            'maksimalnoe_vkhodnoe_davlenie',
+            'avtomaticheskoe_upravlenie',
+            'tip_ustroystva',
+            'shirina_dveri',
+            'vysota_dveri',
+            'diametr_dymokhoda',
+            'prisoyedinenie_dymokhoda',
+            'forma_stekla_i_dverey',
+            'moshchnost',
+            'maksimalnaya_dlinna_drov',
+            'kpd',
+            'sposob_otkrytiya_dvertsy',
+            'nalichie_dymosbornika',
+            'futerovka',
+            'nalichie_zolnika',
+            'teplooobmenik',
+            'moshchnost_teplooobmenika',
+            'tip_dverki',
+            'podacha_vozdushka_izvne',
+            'raspolozhenie_v_pomeshchenii',
+            'dizayn_i_ispolnenie',
+            'material_oblitcovki',
+            'tip_nagrevanija',
+            'optsii_kaminov_i_pechey',
+            'vysota_kaminokomplekta',
+            'nalichie_balki',
+            'three_d',
+            'vtorichnyy_dozhig',
+            'sistema_chistogo_stekla',
+            'klass_energoemkosti',
+            'rezerv3',
+            'tekhnologiya_plameni',
+            'tip_ochaga',
+            'obem',
+            'moshchnost_obogreva',
+            'pult_du',
+            'otlichitelnye_osobennosti',
+            'optsii',
+            'tsvet_ochaga',
+            'tsvet_dereva',
+            'tsvet_kamnya',
+            'material_korpusa',
+            'rezerv',
+            'diametr_dymokhoda_dymokhody',
+            'rezerv1',
         ];
 
         foreach ($nullable255 as $field) {

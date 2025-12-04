@@ -1,2 +1,35 @@
 User-agent: *
-Disallow:
+# Закрываем админку
+Disallow: /admin/
+
+# Закрываем системные маршруты
+Disallow: /login
+Disallow: /register
+Disallow: /logout
+Disallow: /profile
+Disallow: /password/
+Disallow: /cart
+Disallow: /favorites
+Disallow: /compare
+Disallow: /checkout
+Disallow: /thank-you
+Disallow: /privacy-policy
+
+# Закрываем API-обработчики, поиск, формы
+Disallow: /search
+Disallow: /callback
+
+# Закрываем технические каталоги Laravel
+Disallow: /vendor/
+Disallow: /storage/
+Disallow: /bootstrap/
+Disallow: /resources/
+Disallow: /config/
+Disallow: /database/
+Disallow: /routes/
+
+# Разрешаем всё остальное
+Allow: /
+
+# Карта сайта
+Sitemap: https://d-kaminov.com/sitemap.xml

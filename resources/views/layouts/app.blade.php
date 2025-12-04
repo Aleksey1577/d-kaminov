@@ -1,56 +1,65 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- SEO Title -->
-    <title>@yield('seo_title', 'D-Kaminov — Печи, камины, биокамины, электрокамины под ключ')</title>
+    @if(isset($seo) && is_object($seo) && method_exists($seo, 'render'))
+        {{-- Новый мощный SEO-рендер из SeoService --}}
+        {!! $seo->render() !!}
+    @else
+        {{-- Фоллбэк на старую схему через @yield --}}
+        <!-- SEO Title -->
+        <title>@yield('seo_title', 'D-Kaminov — Печи, камины, биокамины, электрокамины под ключ')</title>
 
-    <!-- SEO Description -->
-    <meta name="description" content="@yield('seo_description', 'D-Kaminov: широкий выбор каминов, печей, аксессуаров и комплектующих. Качественные товары с доставкой и установкой.')">
+        <!-- SEO Description -->
+        <meta name="description" content="@yield('seo_description', 'D-Kaminov: широкий выбор каминов, печей, аксессуаров и комплектующих. Качественные товары с доставкой и установкой.')">
 
-    <!-- SEO Keywords -->
-    <meta name="keywords" content="@yield('seo_keywords', 'купить камин, купить биокамин, купить электрокамин, купить печь, купить печь-камин, купить топку')">
+        <!-- SEO Keywords -->
+        <meta name="keywords" content="@yield('seo_keywords', 'купить камин, купить биокамин, купить электрокамин, купить печь, купить печь-камин, купить топку')">
 
-    <!-- Canonical URL -->
-    <link rel="canonical" href="{{ url()->current() }}">
+        <!-- Robots -->
+        <meta name="robots" content="@yield('seo_robots', 'index,follow')">
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:title" content="@yield('seo_title', 'D-Kaminov — Печи, камины, биокамины, электрокамины под ключ')">
-    <meta property="og:description" content="@yield('seo_description', 'D-Kaminov: широкий выбор каминов, печей, аксессуаров и комплектующих. Качественные товары с доставкой и установкой.')">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="@yield('seo_image', asset('img/logo.png'))">
-    <meta property="og:site_name" content="D-Kaminov">
+        <!-- Canonical URL -->
+        <link rel="canonical" href="{{ url()->current() }}">
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('seo_title', 'D-Kaminov — Печи, камины, биокамины, электрокамины под ключ')">
-    <meta name="twitter:description" content="@yield('seo_description', 'D-Kaminov: широкий выбор каминов, печей, аксессуаров и комплектующих. Качественные товары с доставкой и установкой.')">
-    <meta name="twitter:image" content="@yield('seo_image', asset('img/logo.png'))">
-    @vite(['resources/js/app.js'])
+        <!-- Open Graph -->
+        <meta property="og:title" content="@yield('seo_title', 'D-Kaminov — Печи, камины, биокамины, электрокамины под ключ')">
+        <meta property="og:description" content="@yield('seo_description', 'D-Kaminov: широкий выбор каминов, печей, аксессуаров и комплектующих. Качественные товары с доставкой и установкой.')">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:image" content="@yield('seo_image', asset('img/logo.png'))">
+        <meta property="og:site_name" content="D-Kaminov">
 
-    @vite('resources/css/app.css')
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="@yield('seo_title', 'D-Kaminov — Печи, камины, биокамины, электрокамины под ключ')">
+        <meta name="twitter:description" content="@yield('seo_description', 'D-Kaminov: широкий выбор каминов, печей, аксессуаров и комплектующих. Качественные товары с доставкой и установкой.')">
+        <meta name="twitter:image" content="@yield('seo_image', asset('img/logo.png'))">
+    @endif
+
+    {{-- Стили/скрипты проекта (одним вызовом) --}}
+    @vite(['resources/css/app.css','resources/js/app.js'])
+
+    {{-- Alpine.js --}}
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <style>
-        [x-cloak] {
-            display: none !important;
-        }
-    </style>
+
+    <style>[x-cloak]{ display:none !important; }</style>
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="yandex-verification" content="0f294fee5b68e1a0" />
+
+    {{-- Структурированные данные (если где-то делается @push('structured-data')) --}}
+    @stack('structured-data')
 </head>
 
-<body class="font-sans antialiased bg-gray-100 min-h-screen flex flex-col"
-    x-data="{ isOpen: false }">
-
+<body class="font-sans antialiased bg-gray-100 min-h-screen flex flex-col" x-data="{ isOpen: false }">
     @php
-    $cart = session('cart', []);
-    $cartQuantity = collect($cart)->sum('quantity') ?? 0;
-    $favoritesCount = count(session('favorites', []));
-    $compareCount = count(session('compare', []));
+        $cart = session('cart', []);
+        $cartQuantity   = collect($cart)->sum('quantity') ?? 0;
+        $favoritesCount = count(session('favorites', []));
+        $compareCount   = count(session('compare', []));
     @endphp
 
     <header class="bg-white shadow-md sticky top-0 z-50">
@@ -59,11 +68,12 @@
             <div class="inline-flex items-center space-x-4 border border-orange p-1 rounded-lg">
                 <a href="{{ route('home') }}">
                     @if (file_exists(public_path('assets/header/logo.svg')))
-                    <img src="{{ asset('assets/header/logo.svg') }}" alt="Логотип" class="h-10">
+                        <img src="{{ asset('assets/header/logo.svg') }}" alt="Логотип" class="h-10">
                     @else
-                    <span class="text-2xl font-bold text-gray-800">Дом каминов</span>
+                        <span class="text-2xl font-bold text-gray-800">Дом каминов</span>
                     @endif
                 </a>
+
                 <!-- Каталог с выпадающим меню -->
                 <div x-data="{ isOpen: false }" class="relative">
                     <button
@@ -83,25 +93,24 @@
                         x-transition>
                         <ul class="space-y-2 px-4">
                             @foreach ([
-                            'Биокамины' => 'Биокамины',
-                            'Газовые топки' => 'Газовые топки, уличные нагреватели',
-                            'Электроочаги' => 'Электроочаги',
-                            'Дымоходы' => 'Дымоходы',
-                            'Печи и камины' => 'Печи, камины, каминокомплекты',
-                            'Порталы' => 'Порталы',
-                            'Топки' => 'Топки',
-                            'Каминокомплекты' => 'Каминокомплекты',
-                            'Вентиляция' => 'Вентиляция',
-                            'Каминное литье' => 'Каминное/печное литье'
+                                'Биокамины' => 'Биокамины',
+                                'Газовые топки' => 'Газовые топки, уличные нагреватели',
+                                'Электроочаги' => 'Электроочаги',
+                                'Дымоходы' => 'Дымоходы',
+                                'Печи и камины' => 'Печи, камины, каминокомплекты',
+                                'Порталы' => 'Порталы',
+                                'Топки' => 'Топки',
+                                'Каминокомплекты' => 'Каминокомплекты',
+                                'Вентиляция' => 'Вентиляция',
+                                'Каминное литье' => 'Каминное/печное литье'
                             ] as $key => $category)
-                            <li>
-                                <a
-                                    href="{{ route('catalog', ['category' => $category]) }}"
-                                    class="block py-1 text-gray-700 hover:text-orange"
-                                    @click="isOpen = false">
-                                    {{ $key }}
-                                </a>
-                            </li>
+                                <li>
+                                    <a href="{{ route('catalog', ['category' => $category]) }}"
+                                       class="block py-1 text-gray-700 hover:text-orange"
+                                       @click="isOpen = false">
+                                        {{ $key }}
+                                    </a>
+                                </li>
                             @endforeach
                         </ul>
                     </div>
@@ -112,7 +121,8 @@
             <div x-data="{ isOpen: false }" class="md:hidden">
                 <button @click="isOpen = !isOpen" class="text-gray-700 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
                 </button>
             </div>
@@ -124,17 +134,18 @@
 
             <!-- Мобильное меню -->
             <div x-show="isOpen" x-cloak class="absolute top-16 left-0 w-full bg-white shadow-md md:hidden"
-                @click.away="isOpen = false" x-transition>
+                 @click.away="isOpen = false" x-transition>
                 <div class="flex flex-col p-4 space-y-4">
                     @include('components.nav-links')
                     @auth
-                    @if (auth()->user()->is_admin)
-                    <a href="{{ route('admin.index') }}" class="text-gray-700 hover:text-orange">Админ-панель</a>
-                    @endif
-                    <a href="{{ auth()->user()->is_admin ? route('admin.index') : route('profile') }}" class="text-gray-700 hover:text-orange">Личный кабинет</a>
+                        @if (auth()->user()->is_admin)
+                            <a href="{{ route('admin.index') }}" class="text-gray-700 hover:text-orange">Админ-панель</a>
+                        @endif
+                        <a href="{{ auth()->user()->is_admin ? route('admin.index') : route('profile') }}"
+                           class="text-gray-700 hover:text-orange">Личный кабинет</a>
                     @else
-                    <a href="{{ route('login') }}" class="text-gray-700 hover:text-orange">Войти</a>
-                    <a href="{{ route('register') }}" class="text-gray-700 hover:text-orange">Регистрация</a>
+                        <a href="{{ route('login') }}" class="text-gray-700 hover:text-orange">Войти</a>
+                        <a href="{{ route('register') }}" class="text-gray-700 hover:text-orange">Регистрация</a>
                     @endauth
                 </div>
             </div>
@@ -158,12 +169,12 @@
             </div>
 
             @auth
-            <a href="{{ auth()->user()->is_admin ? route('admin.index') : route('profile') }}" class="flex items-center space-x-1">
-                <img src="{{ asset('assets/header/account-header.svg') }}" class="w-6 h-6" alt="Аккаунт">
-                <span class="text-xs text-gray-700">{{ auth()->user()->name }}</span>
-            </a>
+                <a href="{{ auth()->user()->is_admin ? route('admin.index') : route('profile') }}" class="flex items-center space-x-1">
+                    <img src="{{ asset('assets/header/account-header.svg') }}" class="w-6 h-6" alt="Аккаунт">
+                    <span class="text-xs text-gray-700">{{ auth()->user()->name }}</span>
+                </a>
             @else
-            <x-icon-link href="{{ route('login') }}" icon="assets/header/account-header.svg" alt="Вход" text="Вход" />
+                <x-icon-link href="{{ route('login') }}" icon="assets/header/account-header.svg" alt="Вход" text="Вход" />
             @endauth
         </div>
     </header>
@@ -173,10 +184,10 @@
 
     <main class="container mx-auto px-4 py-8 flex-grow">
         @if (session('error'))
-        <div class="bg-red-100 text-red-700 p-4 rounded mb-6">{{ session('error') }}</div>
+            <div class="bg-red-100 text-red-700 p-4 rounded mb-6">{{ session('error') }}</div>
         @endif
         @if (session('success'))
-        <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
+            <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
         @endif
 
         @yield('content')
@@ -233,9 +244,7 @@
 
             <!-- Блок с политикой и копирайтом -->
             <div class="mt-8 pt-6 border-t border-gray-700 flex justify-between text-sm">
-                <p>
-                    ©2010-2026 D-Kaminov. Все права защищены.
-                </p>
+                <p>©2010-2026 D-Kaminov. Все права защищены.</p>
                 <p>
                     <a href="{{ route('privacy.policy') }}" class="hover:text-orange">
                         Политика конфиденциальности
@@ -244,10 +253,9 @@
             </div>
         </div>
     </footer>
-    @stack('structured-data')
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Восстановление скролла (ваш существующий код)
             const scrollPos = sessionStorage.getItem('scrollPos');
             if (scrollPos) {
                 window.scrollTo(0, parseInt(scrollPos));
@@ -256,5 +264,4 @@
         });
     </script>
 </body>
-
 </html>

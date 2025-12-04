@@ -12,12 +12,64 @@ class CatalogController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = 12;
-        $category = $request->category;
+        $perPage  = 12;
+        $category = $request->string('category')->trim()->toString();
 
+        // БАЗА: нужные строки
         $base = Product::whereIn('tip_stroki', ['product', 'product_variant'])
-            ->when($category, fn($q) => $q->where('kategoriya', $category));
+            ->when($category !== '', fn($q) => $q->where('kategoriya', $category));
 
+        // ===== РЕЖИМ 1: Плитка категорий, если категория НЕ выбрана =====
+        if ($category === '') {
+            // Получаем список категорий из товаров (distinct по 'kategoriya')
+            $rawCategories = Product::query()
+                ->whereIn('tip_stroki', ['product', 'product_variant'])
+                ->whereNotNull('kategoriya')
+                ->where('kategoriya', '!=', '')
+                ->distinct()
+                ->orderBy('kategoriya')
+                ->pluck('kategoriya');
+
+            // Карта статичных картинок (как у тебя на главной)
+            $categoryImages = [
+                'Биокамины' => '/assets/category/36994.970.png',
+                'Электроочаги' => '/assets/category/e2lospvm8mvty3ne003sjt6ykq7m644l.jpg',
+                'Порталы' => '/assets/category/portal.jpg',
+                'Каминокомплекты' => '/assets/category/umc7hdqesslii0i4d5gh362l9vvvmz43.jpg',
+                'Топки' => '/assets/category/topki.png',
+                'Печи-камины' => '/assets/category/kamin.jpg',
+                'Газовые топки, уличные нагреватели' => '/assets/category/gazkamin.png',
+                'Дымоходы' => '/assets/category/dimohod.png',
+                'Вентиляция' => '/assets/category/ventilresh.png',
+            ];
+
+            // Преобразуем к массиву для вьюхи
+            $categories = $rawCategories->map(function ($name) use ($categoryImages) {
+                return [
+                    'name' => $name,
+                    'image_url' => $categoryImages[$name] ?? 'images/placeholder.png',
+                ];
+            });
+
+            // Пустые заглушки для include-ов
+            $products = collect();
+            $proizvoditeli = collect();
+            $v_nalichii_options = [];
+            $filterOptions = [];
+            $categoryFilters = [];
+
+            return view('catalog', compact(
+                'products',
+                'proizvoditeli',
+                'v_nalichii_options',
+                'filterOptions',
+                'category',
+                'categoryFilters',
+                'categories'
+            ))->with('showCategories', true);
+        }
+
+        // ===== РЕЖИМ 2: Выбрана категория — фильтры + товары =====
         $proizvoditeli = (clone $base)->distinct()->pluck('proizvoditel')->filter()->values();
         $v_nalichii_options = (clone $base)->distinct()->pluck('v_nalichii_na_sklade')->filter()->values();
 
@@ -46,11 +98,18 @@ class CatalogController extends Controller
             ->when($request->v_nalichii, fn($q, $v) => $q->where('v_nalichii_na_sklade', $v));
 
         $simpleFilters = [
-            'tip_tovara', 'obem_zalivaemogo_topliva', 'material', 'diametr_dymokhoda',
-            'tip_gaza', 'tip_ustroystva', 'tip_ochaga', 'pult_du',
-            'prisoyedinenie_dymokhoda', 'forma_stekla_i_dverey', 'sposob_otkrytiya_dvertsy',
+            'tip_tovara',
+            'obem_zalivaemogo_topliva',
+            'material',
+            'diametr_dymokhoda',
+            'tip_gaza',
+            'tip_ustroystva',
+            'tip_ochaga',
+            'pult_du',
+            'prisoyedinenie_dymokhoda',
+            'forma_stekla_i_dverey',
+            'sposob_otkrytiya_dvertsy',
         ];
-
         foreach ($simpleFilters as $field) {
             if ($request->filled($field)) {
                 $productsQuery->where($field, $request->$field);
@@ -63,23 +122,28 @@ class CatalogController extends Controller
             'glubina' => ['glubina_min', 'glubina_max'],
             'moshchnost' => ['moshchnost_min', 'moshchnost_max'],
         ];
-
         foreach ($rangeFilters as $field => [$minField, $maxField]) {
-            if ($request->filled($minField)) {
-                $productsQuery->where($field, '>=', $request->$minField);
-            }
-            if ($request->filled($maxField)) {
-                $productsQuery->where($field, '<=', $request->$maxField);
-            }
+            if ($request->filled($minField)) $productsQuery->where($field, '>=', $request->$minField);
+            if ($request->filled($maxField)) $productsQuery->where($field, '<=', $request->$maxField);
         }
 
         $products = $productsQuery->orderBy('naimenovanie')->paginate($perPage)->withQueryString();
         $this->setDisplayPrices($products);
 
+        // categories пригодятся для хлебных крошек/сайдбаров (необязательно)
+        $categories = collect();
+
         return view('catalog', compact(
-            'products', 'proizvoditeli', 'v_nalichii_options', 'filterOptions', 'category', 'categoryFilters'
-        ));
+            'products',
+            'proizvoditeli',
+            'v_nalichii_options',
+            'filterOptions',
+            'category',
+            'categoryFilters',
+            'categories'
+        ))->with('showCategories', false);
     }
+
 
     public function search(Request $request)
     {

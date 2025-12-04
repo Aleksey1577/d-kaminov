@@ -1,9 +1,12 @@
 <?php
 
+// app/Models/Product.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -11,99 +14,44 @@ class Product extends Model
     use HasFactory;
 
     protected $primaryKey = 'product_id';
-
-    /**
-     * Так как мы валидируем все поля в контроллере и массово заполняем модель,
-     * проще и безопаснее разрешить всё:
-     */
     protected $guarded = [];
+    protected $appends = ['slug', 'first_image_url', 'thumb_url'];
 
-    protected $appends = ['slug'];
-
-    /*
-     * Слаг: название + product_id, используется в URL
-     */
     public function getSlugAttribute(): string
     {
         return Str::slug($this->naimenovanie) . '-' . $this->product_id;
     }
 
-    /*
-     * Варианты товара (строки с tip_stroki = 'variant')
-     * Логика может быть адаптирована под твою схему.
-     */
     public function variants()
     {
         return $this->hasMany(Product::class, 'product_id', 'product_id')
             ->where('tip_stroki', 'variant');
     }
 
-    /*
-     * Короткие характеристики для карточки товара
-     */
     public function getShortCharacteristics(): array
     {
-        $characteristics = [];
-
-        if ($this->sku) {
-            $characteristics['Артикул'] = $this->sku;
-        }
-
-        if ($this->proizvoditel) {
-            $characteristics['Производитель'] = $this->proizvoditel;
-        }
-
-        if ($this->kategoriya) {
-            $characteristics['Категория'] = $this->kategoriya;
-        }
-
-        if ($this->material) {
-            $characteristics['Материал'] = $this->material;
-        }
-
-        // Ограничиваем до 5 характеристик
-        return array_slice($characteristics, 0, 5);
+        $c = [];
+        if ($this->sku)          $c['Артикул'] = $this->sku;
+        if ($this->proizvoditel) $c['Производитель'] = $this->proizvoditel;
+        if ($this->kategoriya)   $c['Категория'] = $this->kategoriya;
+        if ($this->material)     $c['Материал'] = $this->material;
+        return array_slice($c, 0, 5);
     }
 
-    /*
-     * ==========================
-     *  Переводы / лейблы полей
-     * ==========================
-     */
-
-    /**
-     * Все "человеческие" лейблы для технических полей
-     * берём из config/product.php.
-     */
     public static function extraLabels(): array
     {
         return config('product.extra_labels', []);
     }
 
-    /**
-     * Получить подпись для конкретного поля.
-     * Если в конфиге нет — делаем что-то вроде "Tolshchina Materiala" → "Tolshchina Materiala".
-     */
     public static function labelFor(string $field): string
     {
         $labels = static::extraLabels();
-
-        if (isset($labels[$field])) {
-            return $labels[$field];
-        }
-
-        return Str::of($field)->replace('_', ' ')->headline();
+        return $labels[$field] ?? Str::of($field)->replace('_', ' ')->headline();
     }
 
-    /*
-     * Полный набор характеристик для страницы товара.
-     * Использует те же лейблы, что и формы create/edit.
-     */
     public function getFullCharacteristics(): array
     {
         $map = static::extraLabels();
-
-        // При желании можно сюда же добавить базовые поля, если нужно:
         $base = [
             'proizvoditel' => 'Производитель',
             'strana'       => 'Страна производства',
@@ -112,24 +60,63 @@ class Product extends Model
             'toplivo'      => 'Топливо',
             'tip_tovara'   => 'Тип товара',
         ];
-
-        // Базовые добавляем в начало, не перезаписывая, если уже есть в extra_labels
-        foreach ($base as $field => $label) {
-            if (!isset($map[$field])) {
-                $map[$field] = $label;
-            }
+        foreach ($base as $f => $l) {
+            $map[$f] = $map[$f] ?? $l;
         }
 
-        $result = [];
-
+        $res = [];
         foreach ($map as $field => $label) {
-            $value = $this->{$field} ?? null;
-
-            if ($value !== null && trim((string) $value) !== '') {
-                $result[$label] = $value;
+            $val = $this->{$field} ?? null;
+            if ($val !== null && trim((string)$val) !== '') {
+                $res[$label] = $val;
             }
         }
+        return $res;
+    }
 
-        return $result;
+    /** Первый непустой URL из image_url / image_url_1..20 (без проверки существования) */
+    public function getFirstImageUrlAttribute(): ?string
+    {
+        $fields = array_merge(['image_url'], array_map(fn ($i) => "image_url_{$i}", range(1, 20)));
+        foreach ($fields as $field) {
+            $val = $this->{$field} ?? null;
+            if ($val !== null && trim((string)$val) !== '') {
+                return $val;
+            }
+        }
+        return null;
+    }
+
+    /** Нормализуем путь `/storage/xyz.jpg` → проверяем на диске `public` */
+    protected function resolveExistingUrl(?string $url): ?string
+    {
+        if (!$url) return null;
+
+        // абсолютные URL (http/https/data) — не трогаем
+        if (preg_match('~^(https?:)?//|^data:~i', $url)) {
+            return $url;
+        }
+
+        // относительный путь из storage: "/storage/foo/bar.jpg"
+        if (Str::startsWith($url, '/storage/')) {
+            $relative = Str::after($url, '/storage/'); // foo/bar.jpg
+            if (Storage::disk('public')->exists($relative)) {
+                return $url; // файл есть
+            }
+            return null; // файла нет — не даём 404
+        }
+
+        // любой другой относительный путь — оставляем как есть
+        return $url;
+    }
+
+    /**
+     * Гарантированный превью-URL: существующая первая картинка или плейсхолдер.
+     * Ни одного 404 → нет долгих onerror и «подпрыгиваний».
+     */
+    public function getThumbUrlAttribute(): string
+    {
+        $candidate = $this->resolveExistingUrl($this->first_image_url);
+        return $candidate ?: asset('images/no-image.png');
     }
 }
