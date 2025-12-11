@@ -15,7 +15,7 @@
         </a>
     </div>
 
-    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
         @csrf
 
         {{-- 1. Верх: слева Основная информация, справа Основные характеристики --}}
@@ -279,23 +279,39 @@
         </section>
 
         {{-- 3. Картинки (компактно: превью слева, поля справа, 2 колонки) --}}
-        <section class="border border-gray-100 rounded-lg p-4">
-            <h2 class="text-base font-semibold mb-3">Картинки товара</h2>
-
-            {{-- Массовая загрузка --}}
-            <div class="mb-4 border border-dashed border-gray-300 rounded-md p-3 bg-gray-50">
-                <label class="block text-gray-700 mb-1 text-sm font-medium">
-                    Массовая загрузка изображений
-                </label>
-                <input type="file"
-                    name="images_multi[]"
-                    multiple
-                    accept="image/*"
-                    class="w-full border rounded-md p-2.5 text-sm bg-white">
-                <p class="text-xs text-gray-500 mt-1">
-                    Можно выбрать несколько файлов — они заполнят свободные слоты (основное фото, Фото 1…20).
-                </p>
+        <section class="border border-gray-100 rounded-lg p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-base font-semibold">Картинки товара</h2>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Короткий превью-ряд снизу, детали — по клику.
+                    </p>
+                </div>
+                <button type="button"
+                    data-gallery-toggle
+                    class="text-sm inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition">
+                    <span class="toggle-text">Показать блок</span>
+                    <span aria-hidden="true">▼</span>
+                </button>
             </div>
+
+            <div id="gallery-summary" class="flex items-center gap-2 overflow-x-auto py-1"></div>
+
+            {{-- Массовая загрузка + поля (скрыты по умолчанию) --}}
+            <div class="space-y-4 hidden" data-gallery-body>
+                <div class="border border-dashed border-gray-300 rounded-md p-3 bg-gray-50">
+                    <label class="block text-gray-700 mb-1 text-sm font-medium">
+                        Массовая загрузка изображений
+                    </label>
+                    <input type="file"
+                        name="images_multi[]"
+                        multiple
+                        accept="image/*"
+                        class="w-full border rounded-md p-2.5 text-sm bg-white">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Можно выбрать несколько файлов — они заполнят свободные слоты (основное фото, Фото 1…20).
+                    </p>
+                </div>
 
             @php
             $imageConfigs = [];
@@ -384,6 +400,7 @@
                     </div>
                     @endforeach
                 </div>
+            </div>
         </section>
 
         <div class="flex items-center justify-between pt-2">
@@ -454,6 +471,51 @@
             previews[key] = img;
         });
 
+        /* ---------- Компактная шапка галереи ---------- */
+        const galleryBody = document.querySelector('[data-gallery-body]');
+        const galleryToggle = document.querySelector('[data-gallery-toggle]');
+        const gallerySummary = document.getElementById('gallery-summary');
+
+        function renderGallerySummary() {
+            if (!gallerySummary) return;
+            gallerySummary.innerHTML = '';
+
+            const filled = Object.values(previews).filter(img => img && !img.classList.contains('hidden') && img.src);
+            if (!filled.length) {
+                const placeholder = document.createElement('p');
+                placeholder.className = 'text-xs text-gray-500';
+                placeholder.textContent = 'Пока без изображений — добавьте файл или URL.';
+                gallerySummary.appendChild(placeholder);
+                return;
+            }
+
+            filled.slice(0, 8).forEach(img => {
+                const thumb = document.createElement('div');
+                thumb.className = 'w-12 h-12 rounded border bg-white shadow-sm flex-shrink-0 overflow-hidden';
+                thumb.style.backgroundImage = `url('${img.src}')`;
+                thumb.style.backgroundSize = 'cover';
+                thumb.style.backgroundPosition = 'center';
+                gallerySummary.appendChild(thumb);
+            });
+
+            if (filled.length > 8) {
+                const more = document.createElement('div');
+                more.className = 'w-12 h-12 rounded border border-dashed flex-shrink-0 flex items-center justify-center text-xs text-gray-500 bg-white';
+                more.textContent = `+${filled.length - 8}`;
+                gallerySummary.appendChild(more);
+            }
+        }
+
+        if (galleryToggle && galleryBody) {
+            const textEl = galleryToggle.querySelector('.toggle-text');
+            const arrowEl = galleryToggle.querySelector('[aria-hidden]');
+            galleryToggle.addEventListener('click', () => {
+                const hidden = galleryBody.classList.toggle('hidden');
+                if (textEl) textEl.textContent = hidden ? 'Показать блок' : 'Скрыть блок';
+                if (arrowEl) arrowEl.textContent = hidden ? '▼' : '▲';
+            });
+        }
+
         function updatePreviewFromUrl(key, url) {
             const img = previews[key];
             if (!img) return;
@@ -497,12 +559,14 @@
                         img.src = e.target.result;
                         img.classList.remove('hidden');
                         if (emptyText) emptyText.classList.add('hidden');
+                        renderGallerySummary();
                     };
                     reader.readAsDataURL(file);
                 });
             } else {
                 const handler = () => {
                     updatePreviewFromUrl(key, input.value);
+                    renderGallerySummary();
                 };
                 input.addEventListener('input', handler);
                 input.addEventListener('change', handler);
@@ -518,6 +582,8 @@
                 }
             }
         });
+
+        renderGallerySummary();
 
         /* ---------- Категория → Тип товара (общая логика для create/edit) ---------- */
         const typesDiv = document.getElementById('js-types-by-category');

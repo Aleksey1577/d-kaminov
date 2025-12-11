@@ -1,4 +1,8 @@
-<a href="{{ route('montage') }}" class="text-gray-700 hover:text-orange">Монтаж</a>
-<a href="{{ route('portfolio') }}" class="text-gray-700 hover:text-orange">Наши работы</a>
-<a href="{{ route('delivery') }}" class="text-gray-700 hover:text-orange">Доставка и оплата</a>
-<a href="{{ route('contacts') }}" class="text-gray-700 hover:text-orange">Контакты</a>
+@php
+    $navLink = 'px-3 py-2 rounded-xl text-slate-800 hover:text-orange hover:bg-amber-50 transition font-semibold';
+@endphp
+
+<a href="{{ route('montage') }}" class="{{ $navLink }}">Монтаж</a>
+<a href="{{ route('portfolio') }}" class="{{ $navLink }}">Наши работы</a>
+<a href="{{ route('delivery') }}" class="{{ $navLink }}">Доставка и оплата</a>
+<a href="{{ route('contacts') }}" class="{{ $navLink }}">Контакты</a>

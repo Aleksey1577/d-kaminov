@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Сравнение')
+@section('seo_title', 'Сравнение товаров | D-Kaminov')
+@section('seo_description', 'Сравнение характеристик каминов, печей и аксессуаров, чтобы выбрать подходящую модель в D-Kaminov.')
 
 @section('content')
 @php
@@ -185,110 +187,83 @@
     $label = fn($k) => $labels[$k] ?? ucfirst(str_replace('_', ' ', $k));
 @endphp
 
-<h1 class="text-2xl font-semibold mb-4">Сравнение товаров</h1>
-
-@if($hasProducts)
-    <div class="flex items-center justify-between mb-3">
-        <div></div>
-        <label class="inline-flex items-center gap-2 text-sm text-gray-700 select-none">
-            <input id="diffOnlyToggle" type="checkbox" class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-            Показывать только различия
-        </label>
+<div class="section p-5 sm:p-6 md:p-8 space-y-5">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <div class="eyebrow">Сравнение</div>
+            <h1 class="section-title text-2xl sm:text-3xl">Сравнение товаров</h1>
+        </div>
+        @if($hasProducts)
+            <label class="inline-flex items-center gap-2 text-sm text-slate-700 select-none bg-white rounded-full px-3 py-2 border border-gray-200">
+                <input id="diffOnlyToggle" type="checkbox" class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                Показывать только различия
+            </label>
+        @endif
     </div>
 
-    <style>
-        /* Липкий первый столбец "Характеристика" */
-        .cmp-sticky-first thead th:first-child,
-        .cmp-sticky-first tbody td:first-child {
-            position: sticky;
-            left: 0;
-            z-index: 1;
-            background: #fff; /* совпадает с bg-white таблицы */
-        }
-        /* чтобы заголовочная ячейка была поверх содержимого */
-        .cmp-sticky-first thead th:first-child { z-index: 2; }
-    </style>
+    @if($hasProducts)
+        <style>
+            .cmp-sticky-first thead th:first-child,
+            .cmp-sticky-first tbody td:first-child {
+                position: sticky;
+                left: 0;
+                z-index: 1;
+                background: #fff;
+            }
+            .cmp-sticky-first thead th:first-child { z-index: 2; }
+        </style>
 
-    <div class="bg-white rounded-lg shadow overflow-x-auto">
-        <table class="w-full border-collapse min-w-[1000px] cmp-sticky-first" id="compareTable">
-            <thead>
-                <tr class="bg-gray-50 text-left text-sm text-gray-600">
-                    <th class="border-b p-4 font-semibold w-64">Характеристика</th>
-                    @foreach($products as $product)
-                        <th class="border-b p-4 align-bottom">
-                            <div class="flex items-start gap-3">
-                                <div class="flex-1">
-                                    <div class="font-semibold text-gray-900">
-                                        {{ $product->naimenovanie }}
-                                    </div>
-                                    @php $priceCell = $product->display_price ?? $product->price ?? null; @endphp
-                                    @if(!is_null($priceCell))
-                                        <div class="mt-1 text-gray-500 text-sm">
-                                            {{ $fmtMoney($priceCell) }}
-                                        </div>
-                                    @endif
-                                    @if(!empty($product->v_nalichii_na_sklade))
-                                        <div class="mt-1 text-xs">
-                                            @if($product->v_nalichii_na_sklade === 'Да')
-                                                <span class="inline-block px-2 py-0.5 rounded bg-green-50 text-green-700 border border-green-200">В наличии</span>
-                                            @elseif($product->v_nalichii_na_sklade === 'Нет')
-                                                <span class="inline-block px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Под заказ</span>
-                                            @endif
-                                        </div>
-                                    @endif
-                                </div>
-                                <form action="{{ route('compare.remove', $product->product_id) }}" method="POST"
-                                      onsubmit="sessionStorage.setItem('scrollPos', window.pageYOffset); return true;">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-700 text-sm">Убрать</button>
-                                </form>
-                            </div>
-                        </th>
-                    @endforeach
-                </tr>
-            </thead>
-
-            <tbody class="text-sm">
-                @php $hasAnyImage = $products->contains(fn($p) => !empty($p->image_url)); @endphp
-                @if($hasAnyImage)
-                    <tr class="cmp-row" data-same="0"><!-- изображения всегда показываем -->
-                        <td class="border-b p-4 font-medium text-gray-700">Изображение</td>
+        <div class="surface overflow-x-auto p-0">
+            <table class="w-full border-collapse min-w-[1000px] cmp-sticky-first" id="compareTable">
+                <thead>
+                    <tr class="bg-amber-50/60 text-left text-sm text-slate-700">
+                        <th class="border-b border-gray-100 p-4 font-semibold w-64">Характеристика</th>
                         @foreach($products as $product)
-                            <td class="border-b p-4">
-                                @if(!empty($product->image_url))
-                                    <img src="{{ $product->image_url }}" alt="{{ $product->naimenovanie }}"
-                                         class="w-24 h-24 object-contain rounded border bg-white">
-                                @else
-                                    <span class="text-gray-300">—</span>
-                                @endif
-                            </td>
+                            <th class="border-b border-gray-100 p-4 align-bottom">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-slate-900">
+                                            {{ $product->naimenovanie }}
+                                        </div>
+                                        @php $priceCell = $product->display_price ?? $product->price ?? null; @endphp
+                                        @if(!is_null($priceCell))
+                                            <div class="mt-1 text-slate-600 text-sm">
+                                                {{ $fmtMoney($priceCell) }}
+                                            </div>
+                                        @endif
+                                        @if(!empty($product->v_nalichii_na_sklade))
+                                            <div class="mt-1 text-xs">
+                                                @if($product->v_nalichii_na_sklade === 'Да')
+                                                    <span class="inline-block px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">В наличии</span>
+                                                @elseif($product->v_nalichii_na_sklade === 'Нет')
+                                                    <span class="inline-block px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Под заказ</span>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <form action="{{ route('compare.remove', $product->product_id) }}" method="POST"
+                                          onsubmit="sessionStorage.setItem('scrollPos', window.pageYOffset); return true;">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-700 text-sm">Убрать</button>
+                                    </form>
+                                </div>
+                            </th>
                         @endforeach
                     </tr>
-                @endif
+                </thead>
 
-                @foreach($fieldsToShow as $field)
-                    @php
-                        // Проверим, есть ли отображаемые значения
-                        $rowHasValue = false;
-                        $vals = [];
-                        foreach ($products as $p) {
-                            $v = $render($p, $field);
-                            $vals[] = is_null($v) ? '' : trim((string)$v);
-                            if ($v !== null && $v !== '') $rowHasValue = true;
-                        }
-                        // различия: более одного уникального непустого значения
-                        $unique = collect($vals)->filter(fn($v) => $v !== '')->unique()->values();
-                        $isSame = $rowHasValue ? ($unique->count() <= 1) : true;
-                    @endphp
-
-                    @if($rowHasValue)
-                        <tr class="cmp-row" data-same="{{ $isSame ? '1' : '0' }}">
-                            <td class="border-b p-4 font-medium text-gray-700">{{ $label($field) }}</td>
+                <tbody class="text-sm">
+                    @php $hasAnyImage = $products->contains(fn($p) => !empty($p->image_url)); @endphp
+                    @if($hasAnyImage)
+                        <tr class="cmp-row" data-same="0">
+                            <td class="border-b border-gray-100 p-4 font-medium text-slate-800 bg-amber-50/60">Изображение</td>
                             @foreach($products as $product)
-                                @php $val = $render($product, $field); @endphp
-                                <td class="border-b p-4 align-top">
-                                    @if(!is_null($val) && $val !== '')
-                                        {{ $val }}
+                                <td class="border-b border-gray-100 p-4">
+                                    @if(!empty($product->image_url))
+                                        <img src="{{ $product->image_url }}" alt="{{ $product->naimenovanie }}"
+                                             class="w-24 h-24 object-contain rounded border bg-white"
+                                             loading="lazy"
+                                             decoding="async">
                                     @else
                                         <span class="text-gray-300">—</span>
                                     @endif
@@ -296,19 +271,46 @@
                             @endforeach
                         </tr>
                     @endif
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-@else
-    <div class="bg-white p-6 rounded shadow text-center">
-        <p class="text-gray-600 mb-4">В сравнении пока нет товаров.</p>
-        <a href="{{ route('catalog') }}"
-           class="inline-block px-6 py-3 bg-orange text-white rounded hover:bg-orange-white transition">
-            Перейти в каталог
-        </a>
-    </div>
-@endif
+
+                    @foreach($fieldsToShow as $field)
+                        @php
+                            $rowHasValue = false;
+                            $vals = [];
+                            foreach ($products as $p) {
+                                $v = $render($p, $field);
+                                $vals[] = is_null($v) ? '' : trim((string)$v);
+                                if ($v !== null && $v !== '') $rowHasValue = true;
+                            }
+                            $unique = collect($vals)->filter(fn($v) => $v !== '')->unique()->values();
+                            $isSame = $rowHasValue ? ($unique->count() <= 1) : true;
+                        @endphp
+
+                        @if($rowHasValue)
+                            <tr class="cmp-row" data-same="{{ $isSame ? '1' : '0' }}">
+                                <td class="border-b border-gray-100 p-4 font-medium text-slate-800 bg-amber-50/60">{{ $label($field) }}</td>
+                                @foreach($products as $product)
+                                    @php $val = $render($product, $field); @endphp
+                                    <td class="border-b border-gray-100 p-4 align-top">
+                                        @if(!is_null($val) && $val !== '')
+                                            {{ $val }}
+                                        @else
+                                            <span class="text-gray-300">—</span>
+                                        @endif
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @endif
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @else
+        <div class="surface p-6 text-center">
+            <p class="text-slate-600 mb-4">В сравнении пока нет товаров.</p>
+            <a href="{{ route('catalog') }}" class="btn-primary">Перейти в каталог</a>
+        </div>
+    @endif
+</div>
 
 <script>
     // восстановление позиции скролла после удаления

@@ -18,8 +18,13 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController; // АДМИНСКИЙ контроллер товара
+use App\Http\Controllers\Admin\SlideController;
+use App\Http\Controllers\SitemapController;
 
 use App\Http\Middleware\LogVisit;
+
+// Карта сайта (не логируем визиты)
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 // Публичная часть (с логированием визитов)
 Route::middleware(LogVisit::class)->group(function () {
@@ -108,4 +113,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    // Слайды
+    Route::resource('slides', SlideController::class)->except(['show']);
 });

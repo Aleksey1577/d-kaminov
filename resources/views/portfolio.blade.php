@@ -42,7 +42,9 @@
             <div class="overflow-hidden">
                 <img src="{{ asset('assets/work/' . $work['image']) }}"
                     alt="{{ $work['title'] }}"
-                    class="w-full h-56 object-contain group-hover:scale-105 transition-transform duration-300">
+                    class="w-full h-56 object-contain group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    decoding="async">
             </div>
             <div class="p-5">
                 <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ $work['title'] }}</h3>

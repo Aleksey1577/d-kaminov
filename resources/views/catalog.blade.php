@@ -1,11 +1,22 @@
 @extends('layouts.app')
 
 @section('title', $category ? 'Купить ' . $category : 'Каталог товаров')
+@section('seo_title', $category ? 'Купить ' . $category . ' в D-Kaminov' : 'Каталог каминов и печей D-Kaminov')
+@section('seo_description', $category
+    ? 'Купить ' . $category . ' в Самаре и с доставкой по России. Цены, наличие, фильтры и характеристики в каталоге D-Kaminov.'
+    : 'Каталог каминов, топок, печей и аксессуаров в D-Kaminov. Фильтры по цене, бренду и наличию, доставка и монтаж под ключ.'
+)
 
 @section('content')
-<h1 class="text-3xl font-bold mb-6">
-    {{ $category ? 'Купить ' . $category : 'Каталог товаров' }}
-</h1>
+<div class="mb-6 space-y-2">
+    <div class="eyebrow">{{ $category ? 'Категория' : 'Каталог' }}</div>
+    <h1 class="section-title">
+        {{ $category ? 'Купить ' . $category : 'Каталог товаров' }}
+    </h1>
+    <p class="section-lead text-base">
+        Актуальные цены, наличие и удобные фильтры по бренду, стоимости и характеристикам.
+    </p>
+</div>
 
 {{-- Режим 1: Плитка категорий --}}
 @if($showCategories ?? false)
@@ -27,13 +38,15 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @foreach ($sorted as $cat)
             <a href="{{ url('/catalog') . '?category=' . urlencode($cat['name']) }}"
-               class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+               class="surface overflow-hidden hover:-translate-y-1 transition-transform duration-200 flex flex-col">
                 <img src="{{ asset($cat['image_url']) }}"
                      alt="{{ $cat['name'] }}"
-                     class="w-full h-48 object-contain bg-white">
-                <div class="p-4 text-center">
-                    <h2 class="text-xl font-semibold text-gray-800">{{ $cat['name'] }}</h2>
-                    <p class="text-gray-600 mt-2">Посмотреть товары</p>
+                     class="w-full h-48 object-contain bg-white"
+                     loading="lazy"
+                     decoding="async">
+                <div class="p-5 text-center space-y-2">
+                    <h2 class="text-xl font-semibold text-slate-900">{{ $cat['name'] }}</h2>
+                    <p class="text-slate-600">Посмотреть товары</p>
                 </div>
             </a>
         @endforeach
@@ -42,7 +55,7 @@
 @else
 
     {{-- Режим 2: Категория выбрана — фильтры + товары --}}
-    <div class="flex flex-col md:flex-row gap-5">
+    <div class="flex flex-col md:flex-row gap-6">
 
         <!-- Фильтры -->
         @include('components.filters', [
@@ -52,8 +65,8 @@
         ])
 
         <!-- Сетка товаров -->
-        <div class="w-4/5">
-            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
+        <div class="flex-1">
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 @foreach($products as $product)
                     @include('components.product-card', ['product' => $product])
                 @endforeach
@@ -95,7 +108,7 @@ $existingSeoViews = collect(array_merge($seoViewCandidates, ['seo.catalog.defaul
     ->values();
 @endphp
 
-<div class="mt-12 bg-white p-6 rounded-lg shadow-sm prose max-w-none">
+<div class="mt-12 section p-6 sm:p-7 prose max-w-none">
     @if($existingSeoViews->isNotEmpty())
         @include($existingSeoViews->first())
     @else

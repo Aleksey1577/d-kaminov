@@ -13,29 +13,33 @@ class StaticPageController extends Controller
     public function delivery(SeoService $seo)
     {
         $categories = $this->getCategories();
+        $seo->forPage('delivery')->canonical()->breadcrumb('Главная', route('home'))->breadcrumb('Доставка', route('delivery'));
         $seoData = $seo->getPage('delivery');
-        return view('delivery', compact('categories', 'seoData'));
+        return view('delivery', compact('categories', 'seoData'))->with('seo', $seo);
     }
 
     public function montage(SeoService $seo)
     {
         $categories = $this->getCategories();
+        $seo->forPage('montage')->canonical()->breadcrumb('Главная', route('home'))->breadcrumb('Монтаж', route('montage'));
         $seoData = $seo->getPage('montage');
-        return view('montage', compact('categories', 'seoData'));
+        return view('montage', compact('categories', 'seoData'))->with('seo', $seo);
     }
 
     public function portfolio(SeoService $seo)
     {
         $categories = $this->getCategories();
+        $seo->forPage('portfolio')->canonical()->breadcrumb('Главная', route('home'))->breadcrumb('Портфолио', route('portfolio'));
         $seoData = $seo->getPage('portfolio');
-        return view('portfolio', compact('categories', 'seoData'));
+        return view('portfolio', compact('categories', 'seoData'))->with('seo', $seo);
     }
 
     public function contacts(SeoService $seo)
     {
         $categories = $this->getCategories();
+        $seo->forPage('contacts')->canonical()->breadcrumb('Главная', route('home'))->breadcrumb('Контакты', route('contacts'));
         $seoData = $seo->getPage('contacts');
-        return view('contacts', compact('categories', 'seoData'));
+        return view('contacts', compact('categories', 'seoData'))->with('seo', $seo);
     }
 
     public function privacyPolicy()

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Traits\CommonDataTrait;
+use App\Services\SeoService;
 
 class CatalogController extends Controller
 {
@@ -14,16 +15,22 @@ class CatalogController extends Controller
     {
         $perPage  = 12;
         $category = $request->string('category')->trim()->toString();
+        $seo      = app(SeoService::class);
 
         // БАЗА: нужные строки
-        $base = Product::whereIn('tip_stroki', ['product', 'product_variant'])
+        $base = Product::whereIn('tip_stroki', ['product', 'product_variant', 'variant'])
             ->when($category !== '', fn($q) => $q->where('kategoriya', $category));
 
         // ===== РЕЖИМ 1: Плитка категорий, если категория НЕ выбрана =====
         if ($category === '') {
+            $seo->fill([
+                'title'       => 'Каталог каминов и печей | D-Kaminov',
+                'description' => 'Каталог каминов, топок, печей и аксессуаров в D-Kaminov. Фильтры по цене, бренду и наличию, доставка и монтаж под ключ.',
+            ])->canonical()->breadcrumb('Главная', route('home'))->breadcrumb('Каталог', route('catalog'));
+
             // Получаем список категорий из товаров (distinct по 'kategoriya')
             $rawCategories = Product::query()
-                ->whereIn('tip_stroki', ['product', 'product_variant'])
+                ->whereIn('tip_stroki', ['product', 'product_variant', 'variant'])
                 ->whereNotNull('kategoriya')
                 ->where('kategoriya', '!=', '')
                 ->distinct()
@@ -66,10 +73,15 @@ class CatalogController extends Controller
                 'category',
                 'categoryFilters',
                 'categories'
-            ))->with('showCategories', true);
+            ))->with('showCategories', true)->with('seo', $seo);
         }
 
         // ===== РЕЖИМ 2: Выбрана категория — фильтры + товары =====
+        $seo->fill([
+            'title'       => 'Купить ' . $category . ' | D-Kaminov',
+            'description' => 'Купить ' . $category . ' в Самаре и с доставкой по России. Цены, наличие, фильтры и характеристики в каталоге D-Kaminov.',
+        ])->canonical()->breadcrumb('Главная', route('home'))->breadcrumb('Каталог', route('catalog'))->breadcrumb($category);
+
         $proizvoditeli = (clone $base)->distinct()->pluck('proizvoditel')->filter()->values();
         $v_nalichii_options = (clone $base)->distinct()->pluck('v_nalichii_na_sklade')->filter()->values();
 
@@ -141,13 +153,21 @@ class CatalogController extends Controller
             'category',
             'categoryFilters',
             'categories'
-        ))->with('showCategories', false);
+        ))->with('showCategories', false)->with('seo', $seo);
     }
 
 
     public function search(Request $request)
     {
-        $base = Product::whereIn('tip_stroki', ['product', 'product_variant']);
+        $base = Product::whereIn('tip_stroki', ['product', 'product_variant', 'variant']);
+        $seo  = app(SeoService::class);
+        $query = trim((string) $request->search);
+        $seo->fill([
+            'title'       => $query ? 'Поиск: ' . $query . ' | D-Kaminov' : 'Поиск по каталогу | D-Kaminov',
+            'description' => $query
+                ? 'Результаты поиска по запросу "' . $query . '" в каталоге каминов, топок и печей D-Kaminov.'
+                : 'Поиск по каталогу каминов, топок, печей и аксессуаров в D-Kaminov.',
+        ])->canonical()->breadcrumb('Главная', route('home'))->breadcrumb('Поиск');
 
         $productsQuery = (clone $base)
             ->when($request->search, function ($q, $s) {
@@ -160,6 +180,6 @@ class CatalogController extends Controller
         $products = $productsQuery->orderBy('naimenovanie')->paginate(12)->withQueryString();
         $this->setDisplayPrices($products);
 
-        return view('search', compact('products'));
+        return view('search', compact('products'))->with('seo', $seo);
     }
 }

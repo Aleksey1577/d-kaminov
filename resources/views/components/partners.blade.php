@@ -58,8 +58,14 @@ $partners = [
 @endphp
 
 {{-- ширина как у других секций: без max-w-7xl, просто общий отступ по краям --}}
-<div class="py-16 overflow-hidden px-4 sm:px-6 lg:px-8">
-    <h2 class="text-3xl font-bold text-center mb-12">Наши партнеры</h2>
+<div class="section p-6 sm:p-8 md:p-10 mb-12 overflow-hidden">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
+        <div>
+            <div class="eyebrow">Нам доверяют</div>
+            <h2 class="section-title">Бренды, с которыми мы работаем</h2>
+            <p class="section-lead text-base">Оригинальная продукция и официальная поддержка.</p>
+        </div>
+    </div>
 
     <div class="relative h-40">
         <div class="absolute inset-0 flex items-center overflow-hidden">
@@ -70,7 +76,9 @@ $partners = [
                     <div class="h-28 flex items-center justify-center">
                         <img src="{{ $partner['logo'] }}"
                             alt="{{ $partner['alt'] }}"
-                            class="max-h-full max-w-full object-contain">
+                            class="max-h-full max-w-full object-contain"
+                            loading="lazy"
+                            decoding="async">
                     </div>
                 </div>
                 @endforeach

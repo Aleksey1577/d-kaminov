@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Оформление заказа')
+@section('seo_title', 'Оформление заказа | D-Kaminov')
+@section('seo_description', 'Введите контакты, адрес и способ оплаты для покупки каминов и печей в интернет-магазине D-Kaminov.')
 
 @section('content')
     <h1 class="text-2xl font-bold mb-6">Оформление заказа</h1>

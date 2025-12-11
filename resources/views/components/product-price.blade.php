@@ -1,6 +1,6 @@
 {{-- resources/views/components/product-price.blade.php --}}
 
-<div class="mb-6 bg-white rounded-2xl shadow-lg p-4 sm:p-6 md:p-7 mx-0">
+<div class="surface p-5 sm:p-6 md:p-7 mb-6">
     @php
         // Стартовая цена (если есть варианты — берём либо текущий вариант, либо первый)
         if (!empty($variants) && $variants->isNotEmpty()) {
@@ -37,15 +37,15 @@
 
     {{-- Рейтинг (демо) --}}
     <div class="flex items-center justify-center mb-5">
-        <div class="flex text-yellow-400">
+        <div class="flex text-amber-400">
             @for ($i = 1; $i <= 5; $i++)
-                <svg class="w-5 h-5 {{ $i <= 4 ? 'text-yellow-400' : 'text-gray-300' }} fill-current" viewBox="0 0 20 20">
+                <svg class="w-5 h-5 {{ $i <= 4 ? 'text-amber-400' : 'text-gray-300' }} fill-current" viewBox="0 0 20 20">
                     <path
                         d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
             @endfor
         </div>
-        <span class="ml-2 text-sm text-gray-500">4.5 (12 отзывов)</span>
+        <span class="ml-2 text-sm text-slate-500">4.5 (12 отзывов)</span>
     </div>
 
     {{-- Форма добавления в корзину --}}
@@ -54,14 +54,14 @@
 
         @if (!empty($variants) && $variants->isNotEmpty())
             <div class="mb-4">
-                <label for="variant_id" class="block text-gray-800 font-semibold mb-2 text-sm">
+                <label for="variant_id" class="block text-slate-800 font-semibold mb-2 text-sm">
                     Выберите вариант
                 </label>
 
                 <select
                     id="variant_id"
                     name="variant_id"
-                    class="w-full border-gray-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                    class="w-full rounded-xl border border-amber-200 bg-white px-3 py-3 text-sm focus:border-orange focus:ring focus:ring-orange/20">
                     @foreach ($variants as $variant)
                         @php
                             $vPrice = (float) ($variant->display_price ?? $variant->price ?? 0);
@@ -82,39 +82,78 @@
         <div class="space-y-3">
             <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 mb-1">Количество</span>
+                    <span class="text-xs text-slate-500 mb-1">Количество</span>
                     <input
                         type="number"
                         name="quantity"
                         min="1"
                         value="1"
-                        class="border border-gray-200 rounded-xl px-3 py-2 w-24 text-sm text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        class="w-24 rounded-xl border border-amber-200 px-3 py-2 text-sm text-center focus:border-orange focus:ring focus:ring-orange/20">
                 </div>
 
                 <button
                     type="submit"
-                    class="w-full sm:flex-1 inline-flex items-center justify-center rounded-lg bg-orange px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-orange-white transition-colors duration-200">
+                    class="w-full sm:flex-1 btn-primary justify-center">
                     В корзину
                 </button>
             </div>
         </div>
     </form>
 
+    @php
+        $inFavorites = in_array($product->product_id, session('favorites', []));
+        $inCompare = in_array($product->product_id, session('compare', []));
+    @endphp
+
+    {{-- Действия: сравнить / избранное --}}
+    <div class="mt-4 flex flex-wrap gap-2">
+        <form
+            action="{{ $inCompare ? route('compare.remove', $product->product_id) : route('compare.add', $product->product_id) }}"
+            method="POST"
+            class="inline-flex">
+            @csrf
+            @if($inCompare)
+                @method('DELETE')
+            @endif
+            <button type="submit"
+                    class="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition {{ $inCompare ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 text-slate-800 hover:border-orange hover:text-orange' }}">
+                <img src="{{ asset('assets/header/sravnenie.svg') }}" alt="" class="w-4 h-4">
+                {{ $inCompare ? 'В сравнении' : 'Сравнить' }}
+            </button>
+        </form>
+
+        <form
+            action="{{ $inFavorites ? route('favorites.remove', $product->product_id) : route('favorites.add', $product) }}"
+            method="POST"
+            class="inline-flex">
+            @csrf
+            @if($inFavorites)
+                @method('DELETE')
+            @endif
+            <button type="submit"
+                    class="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition {{ $inFavorites ? 'border-red-200 bg-red-50 text-red-600' : 'border-amber-200 text-slate-800 hover:border-orange hover:text-orange' }}">
+                <img src="{{ asset('assets/header/favourite-header.svg') }}" alt="" class="w-4 h-4">
+                {{ $inFavorites ? 'В избранном' : 'В избранное' }}
+            </button>
+        </form>
+
+    </div>
+
     {{-- Доп. инфо --}}
-    <div class="text-center mb-4 text-xs text-gray-500">
+    <div class="text-center pt-4 mb-4 text-xs text-slate-500">
         Бесплатная доставка по Самаре от 5000 ₽
     </div>
 
     {{-- Контакты / консультация --}}
-    <div class="mt-4 pt-4 border-t border-gray-100">
-        <p class="text-xs text-gray-500 mb-3">
+    <div class="mt-4 pt-4 border-t border-amber-100">
+        <p class="text-xs text-slate-500 mb-3">
             Нужна помощь с выбором или есть вопросы по товару?
         </p>
 
         <div class="flex flex-col sm:flex-row gap-2">
             {{-- Позвонить --}}
             <a href="tel:+79198055747"
-               class="w-full sm:flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-emerald-500 text-emerald-700 bg-white px-3 py-2.5 text-xs sm:text-sm font-medium hover:bg-emerald-50 transition-colors duration-200">
+               class="w-full sm:flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-emerald-300 text-emerald-700 bg-white px-3 py-2.5 text-xs sm:text-sm font-semibold hover:bg-emerald-50 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -127,7 +166,7 @@
             <a href="https://t.me/Dom_Kaminov63"
                target="_blank"
                rel="noopener noreferrer"
-               class="w-full sm:flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-sky-500 px-3 py-2.5 text-xs sm:text-sm font-medium text-white hover:bg-sky-600 transition-colors duration-200">
+               class="w-full sm:flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-sky-500 px-3 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-sky-600 transition">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
                     <path
                         d="M12 0C5.372 0 0 5.373 0 12.001 0 18.628 5.372 24 12 24s12-5.372 12-11.999C24 5.373 18.628 0 12 0zm5.19 7.89l-1.72 8.11c-.13.6-.48.75-.97.47l-2.68-1.98-1.29 1.24c-.14.14-.26.26-.53.26l.19-2.76 5.03-4.54c.22-.19-.05-.3-.34-.11L8.4 12.3 5.7 11.46c-.59-.18-.6-.59.12-.87l11.02-4.25c.5-.18.94.12.82.55z" />
@@ -136,6 +175,7 @@
             </a>
         </div>
     </div>
+
 </div>
 
 <script>
@@ -174,4 +214,5 @@
             apply(); // начальное применение (и цена, и картинка)
         }
     });
+
 </script>

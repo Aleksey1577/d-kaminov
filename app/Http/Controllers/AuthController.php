@@ -12,10 +12,11 @@ class AuthController extends Controller
 {
     use CommonDataTrait;
 
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
         $categories = $this->getCategories();
-        return view('auth.login', compact('categories'));
+        $captchaQuestion = $this->makeCaptcha($request);
+        return view('auth.login', compact('categories', 'captchaQuestion'));
     }
 
     public function login(Request $request)
@@ -23,10 +24,16 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required'],
+            'captcha'  => ['required', 'numeric'],
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (!$this->checkCaptcha($request)) {
+            return back()->withErrors(['captcha' => 'Неверно решён пример.'])->withInput();
+        }
+
+        if (Auth::attempt($request->only('email', 'password'))) {
             $request->session()->regenerate();
+            $request->session()->forget('captcha_answer');
 
             if (Auth::user()->is_admin) {
                 return redirect()->intended('/admin');
@@ -40,10 +47,11 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    public function showRegisterForm()
+    public function showRegisterForm(Request $request)
     {
         $categories = $this->getCategories();
-        return view('auth.register', compact('categories'));
+        $captchaQuestion = $this->makeCaptcha($request);
+        return view('auth.register', compact('categories', 'captchaQuestion'));
     }
 
     public function register(Request $request)
@@ -52,7 +60,12 @@ class AuthController extends Controller
             'name'                  => ['required', 'string', 'max:255'],
             'email'                 => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'              => ['required', 'string', 'min:8', 'confirmed'],
+            'captcha'               => ['required', 'numeric'],
         ]);
+
+        if (!$this->checkCaptcha($request)) {
+            return back()->withErrors(['captcha' => 'Неверно решён пример.'])->withInput();
+        }
 
         $user = User::create([
             'name'     => $data['name'],
@@ -62,6 +75,7 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+        $request->session()->forget('captcha_answer');
 
         return redirect('/profile');
     }
@@ -102,5 +116,19 @@ class AuthController extends Controller
         $user->fill($validated)->save();
 
         return back()->with('success', 'Профиль обновлён');
+    }
+
+    protected function makeCaptcha(Request $request): string
+    {
+        $a = random_int(2, 9);
+        $b = random_int(1, 9);
+        $request->session()->put('captcha_answer', $a + $b);
+        return "{$a} + {$b}";
+    }
+
+    protected function checkCaptcha(Request $request): bool
+    {
+        $expected = $request->session()->pull('captcha_answer');
+        return $expected !== null && (int)$request->input('captcha') === (int)$expected;
     }
 }

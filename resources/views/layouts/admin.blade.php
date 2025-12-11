@@ -10,67 +10,108 @@
     <style>[x-cloak] { display: none !important; }</style>
 </head>
 
-<body class="bg-gray-100 min-h-screen text-gray-900">
+<body class="bg-gray-50 min-h-screen text-gray-900 flex">
+@php
+    $navItems = [
+        ['label' => 'Главная', 'route' => 'admin.index'],
+        ['label' => 'Товары', 'route' => 'admin.products'],
+        ['label' => 'Категории', 'route' => 'admin.categories'],
+        ['label' => 'Слайды', 'route' => 'admin.slides.index'],
+        ['label' => 'Заказы', 'route' => 'admin.orders'],
+        ['label' => 'Пользователи', 'route' => 'admin.users'],
+        ['label' => 'Аналитика', 'route' => 'admin.analytics'],
+    ];
+@endphp
 
 <!-- Боковое меню -->
-<aside class="bg-gray-800 text-white w-64 p-6 fixed inset-y-0 left-0 z-30 hidden md:block">
-    <h2 class="text-xl font-bold mb-6">Админ-панель</h2>
-    <nav class="space-y-2">
-        <!-- Главная -->
-        <a href="{{ route('admin.index') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Главная</a>
-
-        <!-- Товары -->
-        <a href="{{ route('admin.products') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Товары</a>
-
-        <!-- Категории -->
-        <a href="{{ route('admin.categories') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Категории</a>
-
-        <!-- Заказы -->
-        <a href="{{ route('admin.orders') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Заказы</a>
-
-        <!-- Пользователи -->
-        <a href="{{ route('admin.users') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Пользователи</a>
-
-        <!-- Аналитика посещений -->
-        <a href="{{ route('admin.analytics') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Аналитика посещений</a>
-
-        <!-- Настройки (опционально) -->
+<aside class="bg-gray-900 text-white w-72 flex-shrink-0 hidden md:flex flex-col">
+    <div class="px-6 py-6 border-b border-gray-800">
+        <div class="text-lg font-bold tracking-tight">Админ-панель</div>
+        <a href="{{ url('/') }}" class="text-sm text-gray-400 hover:text-white mt-1 inline-flex items-center gap-1">
+            ← На сайт
+        </a>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        @foreach ($navItems as $item)
+            @php $active = request()->routeIs($item['route']); @endphp
+            <a href="{{ route($item['route']) }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg transition
+                      {{ $active ? 'bg-orange text-white' : 'text-gray-200 hover:bg-gray-800 hover:text-white' }}">
+                <span class="text-sm font-medium">{{ $item['label'] }}</span>
+            </a>
+        @endforeach
     </nav>
+    <div class="px-6 py-4 border-t border-gray-800 text-sm text-gray-400">
+        {{ auth()->user()->name ?? 'Админ' }}
+    </div>
+    <a href="{{ route('logout') }}"
+       onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+       class="px-6 pb-6 text-sm text-gray-200 hover:text-white">
+        Выйти
+    </a>
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+        @csrf
+    </form>
 </aside>
 
-<!-- Основной контент -->
-<main class="md:ml-64 p-6">
-    @if(session('success'))
-        <div class="bg-green-100 text-green-700 p-4 rounded mb-6">{{ session('success') }}</div>
-    @endif
-
-    @if(session('error'))
-        <div class="bg-red-100 text-red-700 p-4 rounded mb-6">{{ session('error') }}</div>
-    @endif
-
-    @yield('content')
-</main>
-
 <!-- Мобильное меню -->
-<div x-show="open" x-cloak class="fixed inset-0 flex items-start justify-start h-full bg-black bg-opacity-50 z-20 md:hidden">
-    <div class="w-64 bg-gray-800 text-white p-6 h-full shadow-lg">
-        <button @click="open = false" class="absolute top-4 right-4 text-white text-2xl">×</button>
-        <h2 class="text-xl font-bold mb-6">Меню</h2>
-        <nav class="space-y-2">
-            <a @click="open = false" href="{{ route('admin.index') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Главная</a>
-            <a @click="open = false" href="{{ route('admin.products') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Товары</a>
-            <a @click="open = false" href="{{ route('admin.categories') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Категории</a>
-            <a @click="open = false" href="{{ route('admin.orders') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Заказы</a>
-            <a @click="open = false" href="{{ route('admin.users') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Пользователи</a>
-            <a @click="open = false" href="{{ route('admin.analytics') }}" class="block px-4 py-2 rounded hover:bg-gray-700 transition-colors">Аналитика посещений</a>
+<div x-show="open" x-cloak class="fixed inset-0 z-40 md:hidden">
+    <div class="absolute inset-0 bg-black/50" @click="open = false"></div>
+    <div class="relative bg-gray-900 text-white w-72 h-full shadow-lg">
+        <div class="px-6 py-6 border-b border-gray-800 flex items-center justify-between">
+            <div>
+                <div class="text-lg font-bold">Админ-панель</div>
+                <a href="{{ url('/') }}" class="text-sm text-gray-400 hover:text-white inline-flex items-center gap-1">
+                    ← На сайт
+                </a>
+            </div>
+            <button @click="open = false" class="text-2xl text-gray-200">&times;</button>
+        </div>
+        <nav class="px-3 py-4 space-y-1">
+            @foreach ($navItems as $item)
+                @php $active = request()->routeIs($item['route']); @endphp
+                <a @click="open = false" href="{{ route($item['route']) }}"
+                   class="flex items-center gap-3 px-3 py-2 rounded-lg transition
+                          {{ $active ? 'bg-orange text-white' : 'text-gray-200 hover:bg-gray-800 hover:text-white' }}">
+                    <span class="text-sm font-medium">{{ $item['label'] }}</span>
+                </a>
+            @endforeach
         </nav>
     </div>
 </div>
 
-<!-- Кнопка мобильного меню -->
-<div class="md:hidden fixed bottom-4 right-4 z-10">
-    <button @click="open = !open" class="bg-orange hover:bg-blue-700 text-white p-4 rounded-full shadow-lg">☰</button>
+<!-- Основной контент -->
+<div class="flex-1 flex flex-col min-h-screen">
+    <header class="bg-white border-b border-gray-200 px-4 md:px-8 py-3 flex items-center justify-between sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+            <button @click="open = !open" class="md:hidden inline-flex items-center justify-center h-10 w-10 rounded-full border border-gray-200 text-gray-700">
+                ☰
+            </button>
+            <div>
+                <div class="text-sm text-gray-500">Админ-панель</div>
+                <div class="text-lg font-semibold text-gray-900">@yield('title', 'Админ')</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{{ url('/') }}" class="text-sm text-gray-600 hover:text-orange">На сайт</a>
+            <span class="hidden sm:inline text-sm text-gray-400">|</span>
+            <span class="hidden sm:inline text-sm text-gray-700">{{ auth()->user()->name ?? 'Админ' }}</span>
+        </div>
+    </header>
+
+    <main class="p-4 md:p-8 flex-1">
+        @if(session('success'))
+            <div class="bg-green-100 text-green-800 px-4 py-3 rounded-lg mb-4 border border-green-200">{{ session('success') }}</div>
+        @endif
+
+        @if(session('error'))
+            <div class="bg-red-100 text-red-800 px-4 py-3 rounded-lg mb-4 border border-red-200">{{ session('error') }}</div>
+        @endif
+
+        @yield('content')
+    </main>
 </div>
 
+@yield('scripts')
 </body>
 </html>

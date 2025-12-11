@@ -1,56 +1,96 @@
-<div x-data="{ isOpen: false }" x-show="isOpen" x-cloak
-    class="fixed inset-0  bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50"
+<div x-data="{
+        isOpen: false,
+        loading: false,
+        success: false,
+        error: '',
+        form: { name: '', phone: '', comment: '' },
+        submit() {
+            this.loading = true;
+            this.error = '';
+            this.success = false;
+
+            fetch('{{ route('callback') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                },
+                body: JSON.stringify(this.form)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка при отправке. Попробуйте ещё раз.');
+                this.success = true;
+                this.form = { name: '', phone: '', comment: '' };
+                setTimeout(() => { this.isOpen = false; this.success = false; }, 1600);
+            })
+            .catch(err => this.error = err.message || 'Ошибка')
+            .finally(() => this.loading = false);
+        }
+    }"
+    x-show="isOpen"
+    x-cloak
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4"
     @open-callback.window="isOpen = true" @keydown.escape.window="isOpen = false">
-    <div class="bg-white border p-6 rounded-lg max-w-md w-full mx-4" @click.outside="isOpen = false">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold">Заказать звонок</h2>
-            <button @click="isOpen = false" class="text-gray-500 hover:text-gray-700">
-                ✖
-            </button>
+
+    <div class="surface p-6 sm:p-7 w-full max-w-md shadow-2xl relative" @click.outside="isOpen = false">
+        <button @click="isOpen = false" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">
+            ✖
+        </button>
+
+        <div class="mb-4">
+            <p class="eyebrow mb-2">Позвоните нам</p>
+            <h2 class="text-2xl font-bold text-slate-900">Заказать звонок</h2>
+            <p class="text-sm text-slate-600 mt-1">Оставьте контакты — перезвоним в течение 15 минут.</p>
         </div>
 
-        <form action="{{ route('callback') }}" method="POST"
-            @submit.prevent="
-                fetch('{{ route('callback') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
-                    },
-                    body: JSON.stringify({
-                        name: document.getElementById('callback-name').value,
-                        phone: document.getElementById('callback-phone').value,
-                        comment: document.getElementById('callback-comment').value
-                    })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Заявка отправлена!');
-                        isOpen = false;
-                    } else {
-                        alert('Ошибка при отправке формы');
-                    }
-                })">
+        <template x-if="success">
+            <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-emerald-800 text-sm">
+                Заявка отправлена! Мы свяжемся с вами.
+            </div>
+        </template>
+        <template x-if="error">
+            <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-red-800 text-sm" x-text="error"></div>
+        </template>
+
+        <form @submit.prevent="submit">
             @csrf
-            <div class="mb-4">
-                <label for="callback-name" class="block text-gray-700 mb-1">Имя</label>
-                <input type="text" id="callback-name" name="name" class="w-full border rounded px-3 py-2" required>
+            <div class="space-y-4">
+                <div>
+                    <label for="callback-name" class="block text-sm font-semibold text-slate-800 mb-1">Имя</label>
+                    <input type="text" id="callback-name" name="name" x-model="form.name"
+                        class="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-orange focus:ring focus:ring-orange/20"
+                        required>
+                </div>
+                <div>
+                    <label for="callback-phone" class="block text-sm font-semibold text-slate-800 mb-1">Телефон</label>
+                    <input type="tel" id="callback-phone" name="phone" x-model="form.phone"
+                        class="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-orange focus:ring focus:ring-orange/20"
+                        required>
+                </div>
+                <div>
+                    <label for="callback-comment" class="block text-sm font-semibold text-slate-800 mb-1">Комментарий</label>
+                    <textarea id="callback-comment" name="comment" x-model="form.comment"
+                        class="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-orange focus:ring focus:ring-orange/20"
+                        rows="3" placeholder="Удобное время, модель камина..."></textarea>
+                </div>
             </div>
-            <div class="mb-4">
-                <label for="callback-phone" class="block text-gray-700 mb-1">Телефон</label>
-                <input type="tel" id="callback-phone" name="phone" class="w-full border rounded px-3 py-2" required>
-            </div>
-            <div class="mb-4">
-                <label for="callback-comment" class="block text-gray-700 mb-1">Комментарий</label>
-                <textarea id="callback-comment" name="comment" class="w-full border rounded px-3 py-2" rows="3"></textarea>
-            </div>
-            <div class="flex justify-end space-x-3">
+
+            <div class="flex justify-end gap-3 mt-5">
                 <button type="button" @click="isOpen = false"
-                    class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">
+                    class="btn-ghost px-4 py-2 text-sm">
                     Отмена
                 </button>
-                <button type="submit" class="px-4 py-2 bg-orange text-white rounded hover:bg-orange-white">
-                    Отправить
+                <button type="submit"
+                    class="btn-primary px-4 py-2 text-sm"
+                    :disabled="loading">
+                    <span x-show="!loading">Отправить</span>
+                    <span x-show="loading" class="flex items-center gap-2">
+                        <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25"></circle>
+                            <path d="M4 12a8 8 0 018-8" stroke-width="4" class="opacity-75"></path>
+                        </svg>
+                        Отправляем...
+                    </span>
                 </button>
             </div>
         </form>

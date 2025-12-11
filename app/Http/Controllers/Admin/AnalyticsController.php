@@ -13,8 +13,7 @@ class AnalyticsController extends Controller
     {
         $visits = Visit::with('user')
             ->latest()
-            ->take(100)
-            ->get();
+            ->paginate(100);
 
         return view('admin.analytics.index', compact('visits'));
     }

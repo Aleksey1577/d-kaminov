@@ -8,30 +8,110 @@
 @section('title', 'Главная')
 
 @section('content')
-<!-- Hero блок -->
-<div class="mb-16">
-    <div class="flex flex-col md:flex-row gap-6">
-        <!-- Слайдер (70%) -->
-        <div class="w-full md:w-7/10"
-            x-data="{
-                    currentSlide: 0,
-                    slides: [
-                        { title: 'Новая коллекция', subtitle: 'Откройте последние тенденции', btn: 'Смотреть', link: '/new', bg: 'bg-blue-50' },
-                        { title: 'Скидки до 50%', subtitle: 'Специальные предложения', btn: 'Акции', link: '/sales', bg: 'bg-amber-50' }
-                    ],
-                    init() { setInterval(() => this.currentSlide = (this.currentSlide + 1) % this.slides.length, 5000) }
-                }">
-            <div class="relative h-80 md:h-96 rounded-xl overflow-hidden">
+<!-- Hero -->
+<div class="section p-6 sm:p-8 md:p-10 mb-12">
+    <div class="grid lg:grid-cols-2 gap-8 items-center">
+        <div class="space-y-5">
+            <div class="eyebrow">D-Kaminov · Самара</div>
+            <h1 class="section-title">
+                Камины, печи и монтаж <span class="text-orange">под ключ</span>
+            </h1>
+            <p class="section-lead">
+                Проектируем, поставляем и устанавливаем оборудование с 2010 года.
+                От уютных биокаминов до сложных дымоходных систем — всё делаем силами собственной команды.
+            </p>
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ route('catalog') }}" class="btn-primary">Перейти в каталог</a>
+                <button @click="$dispatch('open-callback')" class="btn-ghost">
+                    Получить консультацию
+                </button>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <span class="pill">550+ реализованных проектов</span>
+                <span class="pill">Гарантия 3 года</span>
+                <span class="pill">Выезд в день обращения</span>
+            </div>
+        </div>
+
+        @php
+            $heroSlides = collect([[
+                'title' => 'Доставка и монтаж',
+                'subtitle' => 'Команда монтажников, согласование проекта и аккуратный монтаж за 1–3 дня.',
+                'btn' => 'Выбрать решение',
+                'link' => route('catalog'),
+                'image' => null,
+                'bg' => 'from-orange-50 via-white to-amber-100/80',
+                'textColor' => 'dark',
+                'overlay' => false,
+            ]])->merge(
+                ($slides ?? collect())->map(function ($slide) {
+                    $rawImage = $slide->image_url;
+                    $image = null;
+                    if ($rawImage) {
+                        $isAbsolute = preg_match('~^https?://~i', $rawImage);
+                        $image = $isAbsolute ? $rawImage : asset(ltrim($rawImage, '/'));
+                    }
+                    $link = $slide->category
+                        ? route('catalog', ['category' => $slide->category])
+                        : route('catalog');
+                    return [
+                        'title' => (string) ($slide->title ?? ''),
+                        'subtitle' => (string) ($slide->subtitle ?? ''),
+                        'btn' => (string) ($slide->button_text ?? ''),
+                        'link' => $link,
+                        'image' => $image,
+                        'bg' => null,
+                        'textColor' => $slide->text_color ?: 'light',
+                        'overlay' => false,
+                    ];
+                })
+            );
+        @endphp
+
+        <div class="relative"
+             x-data="{
+                currentSlide: 0,
+                slides: {{ $heroSlides->values()->toJson() }},
+                timer: null,
+                start() {
+                    if (this.timer) clearInterval(this.timer);
+                    this.timer = setInterval(() => this.currentSlide = (this.currentSlide + 1) % this.slides.length, 6000);
+                },
+                stop() {
+                    if (this.timer) {
+                        clearInterval(this.timer);
+                        this.timer = null;
+                    }
+                },
+                init() { this.start() }
+             }">
+            <div class="surface overflow-hidden h-96 md:h-[28rem] relative" @mouseenter="stop()" @mouseleave="start()">
                 <template x-for="(slide, index) in slides" :key="index">
                     <div x-show="currentSlide === index" x-transition.opacity
-                        class="absolute inset-0 flex items-center p-8 md:p-12"
-                        :class="slide.bg">
-                        <div class="max-w-lg">
-                            <h2 x-text="slide.title" class="text-3xl md:text-4xl font-bold mb-4"></h2>
-                            <p x-text="slide.subtitle" class="text-lg mb-6"></p>
-                            <a :href="slide.link"
-                                x-text="slide.btn"
-                                class="inline-block px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition"></a>
+                        class="absolute inset-0 flex items-center p-0 md:p-10 overflow-hidden">
+                        <template x-if="slide.bg">
+                            <div class="absolute inset-0" :class="['bg-gradient-to-br', slide.bg]"></div>
+                        </template>
+                        <template x-if="slide.image">
+                            <div class="absolute inset-0 opacity-70" :style="`background-image:url(${slide.image});background-size:contain;background-position:center;background-repeat:no-repeat;`"></div>
+                        </template>
+                        <div class="absolute inset-0 bg-gradient-to-r from-slate-900/50 to-transparent" x-show="slide.overlay"></div>
+                        <div class="relative max-w-xl space-y-4 p-7 md:p-10" :class="slide.textColor === 'light' ? 'text-white' : 'text-slate-900'">
+                            <template x-if="slide.title">
+                                <h2 x-text="slide.title" class="text-3xl md:text-4xl font-bold leading-tight"></h2>
+                            </template>
+                            <template x-if="slide.subtitle">
+                                <p x-text="slide.subtitle" class="text-lg md:text-xl opacity-90"></p>
+                            </template>
+                            <template x-if="slide.btn">
+                                <a :href="slide.link || '{{ route('catalog') }}'"
+                                   x-text="slide.btn"
+                                   class="inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold"
+                                   :class="slide.textColor === 'light'
+                                        ? 'border border-white/60 bg-white/10 text-white hover:bg-white/20'
+                                        : 'border border-slate-900 bg-white/80 text-slate-900 hover:bg-white'">
+                                </a>
+                            </template>
                         </div>
                     </div>
                 </template>
@@ -39,22 +119,12 @@
                     <template x-for="(_, index) in slides" :key="index">
                         <button
                             @click="currentSlide = index"
-                            class="w-3 h-3 rounded-full"
-                            :class="currentSlide === index ? 'bg-black' : 'bg-gray-300'">
+                            class="w-3 h-3 rounded-full border border-white/70"
+                            :class="currentSlide === index ? 'bg-orange border-orange' : 'bg-white/40'">
                         </button>
                     </template>
                 </div>
             </div>
-        </div>
-
-        <!-- Текстовый блок (30%) -->
-        <div class="w-full md:w-3/10 bg-gray-100 rounded-xl p-8 flex flex-col justify-center">
-            <h2 class="text-2xl md:text-3xl font-bold mb-4">Наши преимущества</h2>
-            <p class="text-gray-700 mb-6">Бесплатная доставка от 5000₽. Гарантия качества.</p>
-            <a href="/advantages"
-                class="inline-block px-6 py-3 border-2 border-black rounded-lg hover:bg-black hover:text-white transition">
-                Подробнее
-            </a>
         </div>
     </div>
 </div>
@@ -98,26 +168,40 @@ $categoryImages = [
 ];
 @endphp
 
-<div class="mb-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    @foreach ($sortedCategories as $category)
-    @php
-
-    $imagePath = $categoryImages[$category['name']]
-    ?? $category['image_url']
-    ?? 'images/placeholder.png';
-    @endphp
-
-    <a href="/catalog?category={{ urlencode($category['name']) }}"
-        class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-        <img src="{{ asset($imagePath) }}"
-            alt="{{ $category['name'] }}"
-            class="w-full h-48 object-contain">
-        <div class="p-4 text-center">
-            <h2 class="text-xl font-semibold text-gray-800">{{ $category['name'] }}</h2>
-            <p class="text-gray-600 mt-2">Посмотреть товары</p>
+<div class="mb-12">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div>
+            <div class="eyebrow">Каталог</div>
+            <h2 class="section-title">Подберите нужную категорию</h2>
+            <p class="section-lead text-base">Готовые подборки с фильтрами и актуальными ценами.</p>
         </div>
-    </a>
-    @endforeach
+        <a href="{{ route('catalog') }}" class="btn-ghost">Весь каталог</a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @foreach ($sortedCategories as $category)
+            @php
+                $imagePath = $categoryImages[$category['name']]
+                    ?? $category['image_url']
+                    ?? 'images/placeholder.png';
+            @endphp
+
+            <a href="/catalog?category={{ urlencode($category['name']) }}"
+                class="surface overflow-hidden hover:-translate-y-1 transition-transform duration-200 flex flex-col">
+                <div class="w-full h-48 bg-white flex items-center justify-center">
+                    <img src="{{ asset($imagePath) }}"
+                        alt="{{ $category['name'] }}"
+                        class="w-full h-full object-contain mix-blend-multiply"
+                        loading="lazy"
+                        decoding="async">
+                </div>
+                <div class="p-5 text-center space-y-2">
+                    <h2 class="text-xl font-semibold text-slate-900">{{ $category['name'] }}</h2>
+                    <p class="text-slate-600">Посмотреть товары</p>
+                </div>
+            </a>
+        @endforeach
+    </div>
 </div>
 
 

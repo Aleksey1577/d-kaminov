@@ -23,7 +23,7 @@
         </a>
     </div>
 
-    <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
         @csrf
         @method('PUT')
 
@@ -281,86 +281,103 @@
             }
         @endphp
 
-        <section class="border border-gray-100 rounded-lg p-4">
-            <h2 class="text-base font-semibold mb-3">Картинки товара</h2>
-
-            <div class="mb-4 border border-dashed border-gray-300 rounded-md p-3 bg-gray-50">
-                <label class="block text-gray-700 mb-1 text-sm font-medium">Массовая загрузка изображений</label>
-                <input  type="file"
-                        name="images_multi[]"
-                        multiple
-                        accept="image/*"
-                        class="w-full border rounded-md p-2.5 text-sm bg-white">
-                <p class="text-xs text-gray-500 mt-1">
-                    Можно выбрать несколько файлов — они заполнят свободные слоты (основное фото, Фото 1…20).
-                </p>
+        <section class="border border-gray-100 rounded-lg p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-base font-semibold">Картинки товара</h2>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Короткий превью-ряд снизу, детали — по клику.
+                    </p>
+                </div>
+                <button type="button"
+                        data-gallery-toggle
+                        class="text-sm inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition">
+                    <span class="toggle-text">Показать блок</span>
+                    <span aria-hidden="true">▼</span>
+                </button>
             </div>
 
-            <div id="images-sortable" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                @foreach($imageConfigs as $cfg)
-                    @php
-                        $urlField  = $cfg['urlField'];
-                        $fileField = $cfg['fileField'];
-                        $label     = $cfg['label'];
-                        $urlVal    = old($urlField, $product->$urlField);
-                    @endphp
+            <div id="gallery-summary" class="flex items-center gap-2 overflow-x-auto py-1"></div>
 
-                    <div class="draggable-row flex gap-3 bg-gray-50 rounded-md p-3 items-stretch" draggable="true">
-                        <div class="w-28 flex flex-col items-center">
-                            <button type="button"
-                                    class="text-gray-400 text-lg cursor-move"
-                                    title="Перетащите, чтобы изменить порядок">☰</button>
+            <div class="space-y-4 hidden" data-gallery-body>
+                <div class="border border-dashed border-gray-300 rounded-md p-3 bg-gray-50">
+                    <label class="block text-gray-700 mb-1 text-sm font-medium">Массовая загрузка изображений</label>
+                    <input  type="file"
+                            name="images_multi[]"
+                            multiple
+                            accept="image/*"
+                            class="w-full border rounded-md p-2.5 text-sm bg-white">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Можно выбрать несколько файлов — они заполнят свободные слоты (основное фото, Фото 1…20).
+                    </p>
+                </div>
 
-                            <div class="mt-2 w-24 h-24 border rounded bg-white flex items-center justify-center overflow-hidden">
-                                @if($urlVal)
-                                    <img src="{{ asset(ltrim($urlVal, '/')) }}"
-                                         alt="{{ $label }}"
-                                         class="w-full h-full object-cover"
-                                         data-preview="{{ $urlField }}">
-                                @else
-                                    <img src=""
-                                         alt=""
-                                         class="w-full h-full object-cover hidden"
-                                         data-preview="{{ $urlField }}">
-                                    <span class="text-[10px] text-gray-400 text-center px-1">Нет изображения</span>
-                                @endif
+                <div id="images-sortable" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    @foreach($imageConfigs as $cfg)
+                        @php
+                            $urlField  = $cfg['urlField'];
+                            $fileField = $cfg['fileField'];
+                            $label     = $cfg['label'];
+                            $urlVal    = old($urlField, $product->$urlField);
+                        @endphp
+
+                        <div class="draggable-row flex gap-3 bg-gray-50 rounded-md p-3 items-stretch" draggable="true">
+                            <div class="w-28 flex flex-col items-center">
+                                <button type="button"
+                                        class="text-gray-400 text-lg cursor-move"
+                                        title="Перетащите, чтобы изменить порядок">☰</button>
+
+                                <div class="mt-2 w-24 h-24 border rounded bg-white flex items-center justify-center overflow-hidden">
+                                    @if($urlVal)
+                                        <img src="{{ asset(ltrim($urlVal, '/')) }}"
+                                             alt="{{ $label }}"
+                                             class="w-full h-full object-cover"
+                                             data-preview="{{ $urlField }}">
+                                    @else
+                                        <img src=""
+                                             alt=""
+                                             class="w-full h-full object-cover hidden"
+                                             data-preview="{{ $urlField }}">
+                                        <span class="text-[10px] text-gray-400 text-center px-1">Нет изображения</span>
+                                    @endif
+                                </div>
+                                <input type="hidden" name="image_positions[]" value="{{ $urlField }}">
                             </div>
-                            <input type="hidden" name="image_positions[]" value="{{ $urlField }}">
-                        </div>
 
-                        <div class="flex-1 space-y-3">
-                            <div>
-                                <label class="block text-gray-700 mb-1 text-sm font-medium">{{ $label }} (файл)</label>
-                                <input  type="file"
-                                        name="{{ $fileField }}"
-                                        accept="image/*"
-                                        class="w-full border rounded-md p-2.5 text-sm bg-white"
-                                        data-preview-target="{{ $urlField }}">
-                                <p class="text-[11px] text-gray-500 mt-1">
-                                    При загрузке файла URL ниже будет перезаписан.
-                                </p>
-                            </div>
-
-                            <div>
-                                <label class="block text-gray-700 mb-1 text-sm font-medium" for="{{ $urlField }}">
-                                    {{ $label }} (URL)
-                                </label>
-                                <input  type="text"
-                                        name="{{ $urlField }}"
-                                        id="{{ $urlField }}"
-                                        value="{{ $urlVal }}"
-                                        class="w-full border rounded-md p-2.5 text-sm"
-                                        placeholder="/assets/... или https://..."
-                                        data-preview-target="{{ $urlField }}">
-                                @if($urlField === 'image_url')
-                                    <p class="text-xs text-gray-500 mt-1">
-                                        Можно указать URL или загрузить файл — если будет файл, он будет использован приоритетно.
+                            <div class="flex-1 space-y-3">
+                                <div>
+                                    <label class="block text-gray-700 mb-1 text-sm font-medium">{{ $label }} (файл)</label>
+                                    <input  type="file"
+                                            name="{{ $fileField }}"
+                                            accept="image/*"
+                                            class="w-full border rounded-md p-2.5 text-sm bg-white"
+                                            data-preview-target="{{ $urlField }}">
+                                    <p class="text-[11px] text-gray-500 mt-1">
+                                        При загрузке файла URL ниже будет перезаписан.
                                     </p>
-                                @endif
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-1 text-sm font-medium" for="{{ $urlField }}">
+                                        {{ $label }} (URL)
+                                    </label>
+                                    <input  type="text"
+                                            name="{{ $urlField }}"
+                                            id="{{ $urlField }}"
+                                            value="{{ $urlVal }}"
+                                            class="w-full border rounded-md p-2.5 text-sm"
+                                            placeholder="/assets/... или https://..."
+                                            data-preview-target="{{ $urlField }}">
+                                    @if($urlField === 'image_url')
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            Можно указать URL или загрузить файл — если будет файл, он будет использован приоритетно.
+                                        </p>
+                                    @endif
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
         </section>
 
@@ -417,6 +434,50 @@ document.addEventListener('DOMContentLoaded', () => {
         if (key) previews[key] = img;
     });
 
+    const galleryBody = document.querySelector('[data-gallery-body]');
+    const galleryToggle = document.querySelector('[data-gallery-toggle]');
+    const gallerySummary = document.getElementById('gallery-summary');
+
+    function renderGallerySummary() {
+        if (!gallerySummary) return;
+        gallerySummary.innerHTML = '';
+
+        const filled = Object.values(previews).filter(img => img && !img.classList.contains('hidden') && img.src);
+        if (!filled.length) {
+            const placeholder = document.createElement('p');
+            placeholder.className = 'text-xs text-gray-500';
+            placeholder.textContent = 'Пока без изображений — добавьте файл или URL.';
+            gallerySummary.appendChild(placeholder);
+            return;
+        }
+
+        filled.slice(0, 8).forEach(img => {
+            const thumb = document.createElement('div');
+            thumb.className = 'w-12 h-12 rounded border bg-white shadow-sm flex-shrink-0 overflow-hidden';
+            thumb.style.backgroundImage = `url('${img.src}')`;
+            thumb.style.backgroundSize = 'cover';
+            thumb.style.backgroundPosition = 'center';
+            gallerySummary.appendChild(thumb);
+        });
+
+        if (filled.length > 8) {
+            const more = document.createElement('div');
+            more.className = 'w-12 h-12 rounded border border-dashed flex-shrink-0 flex items-center justify-center text-xs text-gray-500 bg-white';
+            more.textContent = `+${filled.length - 8}`;
+            gallerySummary.appendChild(more);
+        }
+    }
+
+    if (galleryToggle && galleryBody) {
+        const textEl = galleryToggle.querySelector('.toggle-text');
+        const arrowEl = galleryToggle.querySelector('[aria-hidden]');
+        galleryToggle.addEventListener('click', () => {
+            const hidden = galleryBody.classList.toggle('hidden');
+            if (textEl) textEl.textContent = hidden ? 'Показать блок' : 'Скрыть блок';
+            if (arrowEl) arrowEl.textContent = hidden ? '▼' : '▲';
+        });
+    }
+
     function updatePreviewFromUrl(key, url) {
         const img = previews[key];
         if (!img) return;
@@ -460,11 +521,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     img.src = e.target.result;
                     img.classList.remove('hidden');
                     if (emptyText) emptyText.classList.add('hidden');
+                    renderGallerySummary();
                 };
                 reader.readAsDataURL(file);
             });
         } else {
-            const handler = () => updatePreviewFromUrl(key, input.value);
+            const handler = () => {
+                updatePreviewFromUrl(key, input.value);
+                renderGallerySummary();
+            };
             input.addEventListener('input', handler);
             input.addEventListener('change', handler);
         }
@@ -476,6 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (key) updatePreviewFromUrl(key, input.value);
         }
     });
+
+    renderGallerySummary();
 });
 </script>
 @endsection

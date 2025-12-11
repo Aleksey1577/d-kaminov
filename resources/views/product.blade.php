@@ -2,16 +2,26 @@
 
 @extends('layouts.app')
 
-@section('seo_title', $seo['seo_title'])
-@section('seo_description', $seo['seo_description'])
-@section('seo_keywords', $seo['seo_keywords'])
+@section('seo_title', $meta['seo_title'] ?? '')
+@section('seo_description', $meta['seo_description'] ?? '')
+@section('seo_keywords', $meta['seo_keywords'] ?? '')
 @section('seo_image', asset($product->image_url))
 
 @section('content')
 <!-- JSON-LD структурированные данные -->
 @include('seo.product-json-ld', ['product' => $product])
 
-<div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+<div class="section p-6 sm:p-8">
+    <div class="mb-6 space-y-2">
+        <div class="eyebrow">Товар</div>
+        <h1 class="section-title text-3xl sm:text-4xl leading-tight">
+            {{ $product->naimenovanie }}
+        </h1>
+        @if($product->sku)
+            <p class="text-sm text-slate-600">Артикул: {{ $product->sku }}</p>
+        @endif
+    </div>
+
     <div class="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-10">
         <!-- Компонент с картинками -->
         <div class="w-full lg:w-1/2">
@@ -35,7 +45,7 @@
     </div>
 
     <!-- Табы -->
-    <div class="mt-6">
+    <div class="mt-8 surface-quiet p-4 sm:p-6">
         <x-product-tabs :product="$product" />
     </div>
 </div>
