@@ -8,8 +8,9 @@
 @section('seo_image', asset($product->image_url))
 
 @section('content')
-<!-- JSON-LD структурированные данные -->
-@include('seo.product-json-ld', ['product' => $product])
+@if(!isset($seo) || !is_object($seo) || !method_exists($seo, 'render'))
+    @include('seo.product-json-ld', ['product' => $product])
+@endif
 
 <div class="section p-6 sm:p-8">
     <div class="mb-6 space-y-2">

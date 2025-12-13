@@ -324,7 +324,7 @@
                     <div class="pt-2">
                         <h4 class="text-xs uppercase tracking-widest text-slate-50 mb-1">Юр. данные</h4>
                         <p class="leading-relaxed text-slate-50">
-                            ИП Краснянский А.М.<br>
+                            ИП Краснянский М.А.<br>
                             ИНН 631200408027<br>
                             ОГРНИП 325632700010391
                         </p>

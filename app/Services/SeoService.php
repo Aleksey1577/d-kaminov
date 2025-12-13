@@ -44,12 +44,12 @@ class SeoService
         'portfolio' => [
             'title'       => 'Наши работы — установленные камины и печи | D-Kaminov',
             'description' => 'Фото и кейсы: профессиональный монтаж каминов и печей под ключ. 15+ лет опыта.',
-            'keywords'    => 'наши работы, фото каминов, проекты каминов, монтаж каминов',
+            'keywords'    => 'наши работы, фото каминов, проекты каминов, монтаж каминов, работы дом каминов',
         ],
         'contacts' => [
             'title'       => 'Контакты | D-Kaminov — Камины и печи в Самаре',
             'description' => 'Телефон, email и адрес в Самаре. Работаем ежедневно с 9:00 до 19:00.',
-            'keywords'    => 'контакты дом каминов, телефон D-Kaminov, адрес каминов Самара',
+            'keywords'    => 'контакты дом каминов, телефон D-Kaminov, адрес каминов Самара, телефон дом каминов, адрес дом каминов',
         ],
     ];
 
@@ -97,12 +97,17 @@ class SeoService
 
     public function forProduct(array $p, array $override = []): static
     {
-        // ожидаем поля: naimenovanie, opisanie (или short), price, sku, brand, image_abs (абсолютный URL)
-        $title = Arr::get($p, 'seo_title') ?: (Arr::get($p, 'naimenovanie') . ' | Купить в D-Kaminov');
-        $desc  = Arr::get($p, 'seo_description') ?: ('Купить ' . Arr::get($p, 'naimenovanie') . ' в D-Kaminov. Доставка по Самаре и России. Гарантия.');
-        $keys  = Arr::get($p, 'seo_keywords') ?: $this->defaults['keywords'];
+        $p = array_merge($p, $override);
 
-        $image = Arr::get($p, 'image_abs') ?: $this->absolute($this->defaults['image']);
+        $name = (string) (Arr::get($p, 'naimenovanie') ?? '');
+
+        $title = (string) (Arr::get($p, 'seo_title') ?: ($name ? $name . ' | Купить в D-Kaminov' : $this->defaults['title']));
+        $desc  = (string) (Arr::get($p, 'seo_description') ?: ($name ? 'Купить ' . $name . ' в D-Kaminov. Доставка по Самаре и России. Гарантия.' : $this->defaults['description']));
+        $keys  = (string) (Arr::get($p, 'seo_keywords') ?: $this->defaults['keywords']);
+
+        $image = (string) (Arr::get($p, 'image_abs') ?: Arr::get($p, 'image') ?: $this->absolute($this->defaults['image']));
+        $image = $this->absolute($image);
+        $url   = (string) (Arr::get($p, 'url') ?: URL::current());
 
         $this->fill([
             'title'       => $title,
@@ -111,24 +116,61 @@ class SeoService
             'image'       => $image,
         ]);
 
+        $price = Arr::get($p, 'price');
+        $price = is_numeric($price) ? (float) $price : null;
+
+        $rawStock = (string) (Arr::get($p, 'v_nalichii_na_sklade') ?? Arr::get($p, 'availability') ?? '');
+        $stock = Str::of($rawStock)->lower()->trim();
+        $availability = 'https://schema.org/InStock';
+        if ($stock->contains(['под заказ', 'предзаказ', 'preorder'])) {
+            $availability = 'https://schema.org/PreOrder';
+        } elseif ($stock->contains(['нет', 'отсут', 'out of stock', '0'])) {
+            $availability = 'https://schema.org/OutOfStock';
+        } elseif (in_array((string) $stock, ['да', 'в наличии', 'есть', '1', 'true'], true)) {
+            $availability = 'https://schema.org/InStock';
+        }
+
+        $descriptionSource = (string) (
+            Arr::get($p, 'opisanije')
+            ?: Arr::get($p, 'opisanie')
+            ?: Arr::get($p, 'short')
+            ?: $desc
+        );
+
+        $offers = Arr::get($p, 'offers');
+        if (!is_array($offers) || !isset($offers['@type'])) {
+            $offers = [
+                '@type'         => 'Offer',
+                'url'           => $url,
+                'priceCurrency' => 'RUB',
+                'price'         => $price !== null ? number_format($price, 0, '.', '') : null,
+                'availability'  => $availability,
+            ];
+        }
+
+        $this->og([
+            'og:type' => 'product',
+        ]);
+        if ($price !== null) {
+            $this->og([
+                'product:price:amount' => number_format($price, 0, '.', ''),
+                'product:price:currency' => 'RUB',
+            ]);
+        }
+
         // JSON-LD Product
         $productLd = [
             '@context'    => 'https://schema.org',
             '@type'       => 'Product',
-            'name'        => Arr::get($p, 'naimenovanie'),
-            'sku'         => Arr::get($p, 'sku'),
+            'name'        => $name ?: null,
+            'sku'         => Arr::get($p, 'sku') ?: null,
             'brand'       => Arr::get($p, 'brand') ? ['@type' => 'Brand', 'name' => Arr::get($p, 'brand')] : null,
             'image'       => [$image],
-            'description' => Str::limit(strip_tags(Arr::get($p, 'opisanie') ?: Arr::get($p, 'short')), 500),
-            'offers'      => [
-                '@type'         => 'Offer',
-                'url'           => URL::current(),
-                'priceCurrency' => 'RUB',
-                'price'         => number_format((float) Arr::get($p, 'price', 0), 0, '.', ''),
-                'availability'  => 'https://schema.org/InStock',
-            ],
+            'description' => Str::limit(strip_tags($descriptionSource), 500),
+            'offers'      => array_filter($offers, fn($v) => !is_null($v)),
+            'url'         => $url,
         ];
-        $this->pushJsonLd(array_filter($productLd, fn($v) => !is_null($v)));
+        $this->pushJsonLd(array_filter($productLd, fn($v) => !is_null($v) && $v !== ''));
 
         return $this;
     }

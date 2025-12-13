@@ -3,7 +3,7 @@
     <a href="{{ route('product', $product->slug) }}" class="block flex-grow">
         <div class="relative w-full h-64 bg-white flex items-center justify-center">
             <img
-                src="{{ $product->image_url ?: asset('images/placeholder.png') }}"
+                src="{{ $product->image_url ?: asset('assets/placeholder.png') }}"
                 alt="{{ $product->naimenovanie }}"
                 class="w-full h-full object-contain mix-blend-multiply"
                 loading="lazy"

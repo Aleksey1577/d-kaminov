@@ -1,3 +1,7 @@
+@php
+    $categoryName = $categoryName ?? '';
+@endphp
+
 <div x-data="{ open: false }" class="md:w-1/5">
     <!-- Кнопка для мобильных -->
     <button @click="open = !open"
@@ -48,7 +52,7 @@
                 @php $opts = $filterOptions @endphp
 
                 {{-- Биокамин --}}
-                @if(request()->category === 'Биокамины')
+                @if($categoryName === 'Биокамины')
                 <div>
                     <label for="tip_tovara" class="block text-sm font-semibold text-slate-800 mb-2">Тип товара</label>
                     <select name="tip_tovara" id="tip_tovara"
@@ -72,7 +76,7 @@
                 @endif
 
                 {{-- Каминное/печное литье --}}
-                @if(request()->category === 'Каминное/печное литье')
+                @if($categoryName === 'Каминное/печное литье')
                 <div>
                     <label for="tip_tovara" class="block text-sm font-semibold text-slate-800 mb-2">Тип товара</label>
                     <select name="tip_tovara" id="tip_tovara"
@@ -97,7 +101,7 @@
                 @endif
 
                 {{-- Газовые топки, уличные нагреватели --}}
-                @if(request()->category === 'Газовые топки, уличные нагреватели')
+                @if($categoryName === 'Газовые топки, уличные нагреватели')
 
                 <div>
                     <label for="tip_gaza" class="block text-sm font-semibold text-slate-800 mb-2">Тип газа</label>
@@ -122,7 +126,7 @@
                 @endif
 
                 {{-- Вентиляция --}}
-                @if(request()->category === 'Вентиляция')
+                @if($categoryName === 'Вентиляция')
 
                 <div>
                     <label for="tip_tovara" class="block text-sm font-semibold text-slate-800 mb-2">Тип товара</label>
@@ -137,7 +141,7 @@
                 @endif
 
                 {{-- Каминокомплекты --}}
-                @if(request()->category === 'Каминокомплекты')
+                @if($categoryName === 'Каминокомплекты')
 
                 <!-- Размеры -->
                 <div class="space-y-2">
@@ -167,7 +171,7 @@
                 @endif
 
                 {{-- Электроочаги --}}
-                @if(request()->category === 'Электроочаги')
+                @if($categoryName === 'Электроочаги')
 
                 <div>
                     <label for="tip_ochaga" class="block text-sm font-semibold text-slate-800 mb-2">Тип очага</label>
@@ -193,7 +197,7 @@
                 @endif
 
                 {{-- Печи, камины, каминокомплекты --}}
-                @if(request()->category === 'Печи, камины, каминокомплекты')
+                @if($categoryName === 'Печи, камины, каминокомплекты')
 
                 <div>
                     <label for="diametr_dymokhoda" class="block text-sm font-semibold text-slate-800 mb-2">Диаметр дымохода</label>
@@ -249,10 +253,15 @@
                 @endif
 
                 {{-- Остальные категории (Каминокомплекты, Электроочаги и т.п.) --}}
-                @if(in_array(request()->category, [
-                'Каминокомплекты','Электроочаги','Порталы','Топки',
-                'Вентиляция','Печи, камины, каминокомплекты','Дымоходы'
-                ]))
+                @if(in_array($categoryName, [
+                    'Каминокомплекты',
+                    'Электроочаги',
+                    'Порталы',
+                    'Топки',
+                    'Вентиляция',
+                    'Печи, камины, каминокомплекты',
+                    'Дымоходы',
+                ], true))
                 {{-- Для всех этих достаточно общих price+proizvoditel --}}
                 {{-- (Мы уже показали их выше) --}}
                 @endif

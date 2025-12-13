@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Traits\CommonDataTrait;
@@ -14,8 +15,30 @@ class CatalogController extends Controller
     public function index(Request $request)
     {
         $perPage  = 12;
-        $category = $request->string('category')->trim()->toString();
+        $categoryParam = $request->string('category')->trim()->toString();
         $seo      = app(SeoService::class);
+
+        $category = '';
+        $categorySlug = null;
+
+        if ($categoryParam !== '') {
+            $bySlug = Category::query()->where('slug', $categoryParam)->first();
+            if ($bySlug) {
+                $category = $bySlug->name;
+                $categorySlug = $bySlug->slug;
+            } else {
+                $byName = Category::query()->where('name', $categoryParam)->first();
+                if ($byName) {
+                    $query = $request->query();
+                    $query['category'] = $byName->slug;
+
+                    return redirect()
+                        ->route('catalog', $query, 301);
+                }
+
+                $category = $categoryParam;
+            }
+        }
 
         // БАЗА: нужные строки
         $base = Product::whereIn('tip_stroki', ['product', 'product_variant', 'variant'])
@@ -26,7 +49,7 @@ class CatalogController extends Controller
             $seo->fill([
                 'title'       => 'Каталог каминов и печей | D-Kaminov',
                 'description' => 'Каталог каминов, топок, печей и аксессуаров в D-Kaminov. Фильтры по цене, бренду и наличию, доставка и монтаж под ключ.',
-            ])->canonical()->breadcrumb('Главная', route('home'))->breadcrumb('Каталог', route('catalog'));
+            ])->canonical(route('catalog'))->breadcrumb('Главная', route('home'))->breadcrumb('Каталог', route('catalog'));
 
             // Получаем список категорий из товаров (distinct по 'kategoriya')
             $rawCategories = Product::query()
@@ -80,7 +103,20 @@ class CatalogController extends Controller
         $seo->fill([
             'title'       => 'Купить ' . $category . ' | D-Kaminov',
             'description' => 'Купить ' . $category . ' в Самаре и с доставкой по России. Цены, наличие, фильтры и характеристики в каталоге D-Kaminov.',
-        ])->canonical()->breadcrumb('Главная', route('home'))->breadcrumb('Каталог', route('catalog'))->breadcrumb($category);
+        ])->canonical(route('catalog', ['category' => $categorySlug ?: $categoryParam]))
+            ->breadcrumb('Главная', route('home'))
+            ->breadcrumb('Каталог', route('catalog'))
+            ->breadcrumb($category);
+
+        $queryWithoutCategoryAndPage = collect($request->query())->except(['category', 'page'])->filter(function ($value) {
+            if (is_array($value)) {
+                return !empty($value);
+            }
+            return $value !== null && $value !== '';
+        });
+        if ($request->integer('page', 1) > 1 || $queryWithoutCategoryAndPage->isNotEmpty()) {
+            $seo->robots('noindex,follow');
+        }
 
         $proizvoditeli = (clone $base)->distinct()->pluck('proizvoditel')->filter()->values();
         $v_nalichii_options = (clone $base)->distinct()->pluck('v_nalichii_na_sklade')->filter()->values();
@@ -141,6 +177,22 @@ class CatalogController extends Controller
 
         $products = $productsQuery->orderBy('naimenovanie')->paginate($perPage)->withQueryString();
         $this->setDisplayPrices($products);
+
+        $itemList = [
+            '@context' => 'https://schema.org',
+            '@type' => 'ItemList',
+            'itemListElement' => [],
+        ];
+        foreach ($products as $i => $product) {
+            $itemList['itemListElement'][] = [
+                '@type' => 'ListItem',
+                'position' => (($products->currentPage() - 1) * $products->perPage()) + $i + 1,
+                'url' => route('product', ['slug' => $product->slug]),
+            ];
+        }
+        if (!empty($itemList['itemListElement'])) {
+            $seo->pushJsonLd($itemList);
+        }
 
         // categories пригодятся для хлебных крошек/сайдбаров (необязательно)
         $categories = collect();

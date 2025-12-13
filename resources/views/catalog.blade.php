@@ -61,7 +61,8 @@
         @include('components.filters', [
             'proizvoditeli' => $proizvoditeli,
             'v_nalichii_options' => $v_nalichii_options,
-            'currentFilters' => request()->all()
+            'currentFilters' => request()->all(),
+            'categoryName' => $category,
         ])
 
         <!-- Сетка товаров -->
