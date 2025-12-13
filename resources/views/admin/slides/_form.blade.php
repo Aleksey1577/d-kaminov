@@ -41,12 +41,12 @@
         </div>
         <div class="md:col-span-2 space-y-2">
             <label class="block text-sm font-medium text-gray-700 mb-1">Изображение</label>
-            <input type="file" name="image_file" accept="image/*" class="w-full border rounded-md px-3 py-2.5 text-sm bg-white">
+            <input type="file" name="image_file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" class="w-full border rounded-md px-3 py-2.5 text-sm bg-white">
             <p class="text-xs text-gray-500">Можно указать файл или URL ниже.</p>
             <input type="text" name="image_url" value="{{ old('image_url', $slide->image_url ?? '') }}" class="w-full border rounded-md px-3 py-2.5 text-sm" placeholder="/assets/... или https://...">
             @if(!empty($slide?->image_url))
                 <div class="flex items-center gap-3 text-sm">
-                    <img src="{{ asset(ltrim($slide->image_url, '/')) }}" alt="preview" class="w-20 h-12 object-cover rounded border">
+                    <img src="{{ \Illuminate\Support\Str::startsWith($slide->image_url, ['http://', 'https://']) ? $slide->image_url : asset(ltrim($slide->image_url, '/')) }}" alt="preview" class="w-20 h-12 object-cover rounded border">
                     <label class="inline-flex items-center gap-2">
                         <input type="checkbox" name="remove_image" value="1" class="h-4 w-4">
                         <span class="text-gray-700">Удалить изображение</span>

@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController; // АДМИНСКИЙ контроллер товара
 use App\Http\Controllers\Admin\SlideController;
+use App\Http\Controllers\Admin\PortfolioController as AdminPortfolioController;
 use App\Http\Controllers\SitemapController;
 
 use App\Http\Middleware\LogVisit;
@@ -42,11 +43,11 @@ Route::middleware(LogVisit::class)->group(function () {
     Route::get('/portfolio', [StaticPageController::class, 'portfolio'])->name('portfolio');
     Route::get('/contacts', [StaticPageController::class, 'contacts'])->name('contacts');
     Route::get('/privacy-policy', [StaticPageController::class, 'privacyPolicy'])->name('privacy.policy');
-    Route::post('/callback', [StaticPageController::class, 'callback'])->name('callback');
+    Route::post('/callback', [StaticPageController::class, 'callback'])->middleware('throttle:callback')->name('callback');
 
     // Оформление заказа (публичная часть)
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
-    Route::post('/checkout', [OrderController::class, 'store'])->name('order.store');
+    Route::post('/checkout', [OrderController::class, 'store'])->middleware('throttle:checkout')->name('order.store');
     Route::get('/thank-you', [OrderController::class, 'thankYou'])->name('thank-you');
 
     // Корзина
@@ -73,7 +74,7 @@ Route::middleware('auth')->group(function () {
 
 // Аутентификация
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
@@ -116,4 +117,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
 
     // Слайды
     Route::resource('slides', SlideController::class)->except(['show']);
+
+    // Портфолио
+    Route::get('/portfolio', [AdminPortfolioController::class, 'index'])->name('portfolio.index');
+    Route::get('/portfolio/create', [AdminPortfolioController::class, 'create'])->name('portfolio.create');
+    Route::post('/portfolio', [AdminPortfolioController::class, 'store'])->name('portfolio.store');
+    Route::get('/portfolio/{portfolioItem}/edit', [AdminPortfolioController::class, 'edit'])->name('portfolio.edit');
+    Route::put('/portfolio/{portfolioItem}', [AdminPortfolioController::class, 'update'])->name('portfolio.update');
+    Route::delete('/portfolio/{portfolioItem}', [AdminPortfolioController::class, 'destroy'])->name('portfolio.destroy');
 });

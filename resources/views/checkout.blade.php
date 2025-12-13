@@ -13,11 +13,22 @@
         </div>
     @endif
 
+    @if ($errors->any())
+        <div class="bg-red-50 border border-red-200 text-red-800 p-4 rounded mb-6">
+            <div class="font-semibold mb-2">Проверьте поля формы:</div>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <!-- Форма оформления заказа -->
-    <form action="{{ route('checkout') }}" method="POST"
+    <form action="{{ route('order.store') }}" method="POST"
           x-data="{ 
-              pickupType: 'pickup',
-              paymentMethod: 'cash',
+              pickupType: @js(old('pickup_type', 'pickup')),
+              paymentMethod: @js(old('payment_method', 'cash')),
               setPickupType(type) { this.pickupType = type },
               setPaymentMethod(method) { this.paymentMethod = method }
           }"
@@ -34,21 +45,31 @@
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700">Имя</label>
                         <input type="text" name="name" id="name" required
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                               value="{{ old('name', auth()->user()->name ?? '') }}"
+                               autocomplete="name"
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange focus:ring focus:ring-orange/20">
+                        @error('name') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <!-- Телефон -->
                     <div>
                         <label for="phone" class="block text-sm font-medium text-gray-700">Телефон</label>
-                        <input type="text" name="phone" id="phone" required
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        <input type="tel" name="phone" id="phone" required
+                               value="{{ old('phone', auth()->user()->phone ?? '') }}"
+                               autocomplete="tel"
+                               placeholder="+7 ___ ___-__-__"
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange focus:ring focus:ring-orange/20">
+                        @error('phone') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <!-- Email -->
                     <div class="md:col-span-2">
                         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                         <input type="email" name="email" id="email" required
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+                               value="{{ old('email', auth()->user()->email ?? '') }}"
+                               autocomplete="email"
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange focus:ring focus:ring-orange/20">
+                        @error('email') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <!-- Способ получения -->
@@ -87,7 +108,9 @@
                         <div x-show="pickupType === 'delivery'">
                             <label for="address" class="block text-sm font-medium text-gray-700">Адрес доставки</label>
                             <textarea name="address" id="address" rows="3"
-                                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"></textarea>
+                                      placeholder="Город, улица, дом, подъезд, этаж, квартира"
+                                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange focus:ring focus:ring-orange/20">{{ old('address') }}</textarea>
+                            @error('address') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
                         </div>
                     </div>
 
@@ -117,8 +140,8 @@
                         </div>
 
                         <!-- Скрытые поля для отправки -->
-                        <input type="hidden" name="pickup_type" x-model="pickupType">
-                        <input type="hidden" name="payment_method" x-model="paymentMethod">
+                        <input type="hidden" name="pickup_type" value="{{ old('pickup_type', 'pickup') }}" x-model="pickupType">
+                        <input type="hidden" name="payment_method" value="{{ old('payment_method', 'cash') }}" x-model="paymentMethod">
                     </div>
                 </div>
             </div>
@@ -142,7 +165,7 @@
                     {{ number_format(collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']), 2) }} ₽
                 </span>
             </div>
-            <button type="submit" class="mt-6 w-full bg-orange hover:bg-blue-700 text-white py-2 px-4 rounded">
+            <button type="submit" class="mt-6 w-full bg-orange hover:bg-orange-white text-white py-2 px-4 rounded">
                 Оформить заказ
             </button>
         </div>

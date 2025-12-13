@@ -79,8 +79,8 @@ class SlideController extends Controller
             'subtitle' => ['nullable', 'string', 'max:500'],
             'button_text' => ['nullable', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:255'],
-            'image_url' => ['nullable', 'string', 'max:1024'],
-            'image_file' => ['nullable', 'image', 'max:5120'],
+            'image_url' => ['nullable', 'string', 'max:1024', 'regex:/^(\\/(?!\\/)|https?:\\/\\/)/i'],
+            'image_file' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'text_color' => ['nullable', 'in:light,dark'],
             'position' => ['nullable', 'integer', 'min:1'],
         ]);

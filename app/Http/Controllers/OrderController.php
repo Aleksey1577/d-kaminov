@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\TelegramNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\OrderItem;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -51,7 +53,7 @@ class OrderController extends Controller
                 'name'           => $validated['name'],
                 'email'          => $validated['email'],
                 'phone'          => $validated['phone'],
-                'address'        => $validated['address'] ?? null,
+                'address'        => $validated['address'] ?? '',
                 'pickup_type'    => $validated['pickup_type'],
                 'payment_method' => $validated['payment_method'],
                 'total'          => $total,
@@ -72,10 +74,17 @@ class OrderController extends Controller
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->with('error', 'Не удалось оформить заказ. Попробуйте ещё раз.');
+            Log::warning('Order create failed', ['exception' => $e]);
+            return back()->withInput()->with('error', 'Не удалось оформить заказ. Попробуйте ещё раз.');
         }
 
         session()->forget('cart');
+
+        try {
+            app(TelegramNotifier::class)->sendOrderCreated($order);
+        } catch (\Throwable $e) {
+            Log::warning('Telegram order notify failed', ['exception' => $e, 'order_id' => $order->id ?? null]);
+        }
 
         return redirect()->route('thank-you')->with('success', 'Заказ успешно оформлен!');
     }

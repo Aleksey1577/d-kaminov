@@ -17,6 +17,7 @@
         ['label' => 'Товары', 'route' => 'admin.products'],
         ['label' => 'Категории', 'route' => 'admin.categories'],
         ['label' => 'Слайды', 'route' => 'admin.slides.index'],
+        ['label' => 'Портфолио', 'route' => 'admin.portfolio.index'],
         ['label' => 'Заказы', 'route' => 'admin.orders'],
         ['label' => 'Пользователи', 'route' => 'admin.users'],
         ['label' => 'Аналитика', 'route' => 'admin.analytics'],

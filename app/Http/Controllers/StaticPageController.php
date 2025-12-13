@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PortfolioItem;
 use App\Services\SeoService;
 use App\Http\Traits\CommonDataTrait;
 use Illuminate\Http\Request;
@@ -31,7 +32,12 @@ class StaticPageController extends Controller
         $categories = $this->getCategories();
         $seo->forPage('portfolio')->canonical()->breadcrumb('Главная', route('home'))->breadcrumb('Портфолио', route('portfolio'));
         $seoData = $seo->getPage('portfolio');
-        return view('portfolio', compact('categories', 'seoData'))->with('seo', $seo);
+        $portfolioItems = PortfolioItem::query()
+            ->where('is_active', true)
+            ->orderBy('position')
+            ->get();
+
+        return view('portfolio', compact('categories', 'seoData', 'portfolioItems'))->with('seo', $seo);
     }
 
     public function contacts(SeoService $seo)
