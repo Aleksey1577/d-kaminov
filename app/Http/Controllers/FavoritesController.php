@@ -18,7 +18,11 @@ class FavoritesController extends Controller
         }
         $products = Product::whereIn('product_id', $favoriteIds)->get();
         $this->setDisplayPrices($products);
-        return view('favorites', compact('products', 'favoriteIds'));
+        return view('favorites', compact('products', 'favoriteIds'))
+            ->with('breadcrumbs', [
+                ['name' => 'Главная', 'url' => route('home')],
+                ['name' => 'Избранное', 'url' => null],
+            ]);
     }
 
     public function add(Product $product)

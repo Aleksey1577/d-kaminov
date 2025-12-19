@@ -16,38 +16,52 @@
         </a>
     </div>
 
-    <!-- Фильтры -->
-    <form method="GET" action="{{ route('admin.products') }}" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {{-- Поиск --}}
-            <div class="md:col-span-2">
-                <label class="block text-sm text-gray-600 mb-1">Поиск</label>
-                <input type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Название или артикул…"
-                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
-            </div>
+	    <!-- Фильтры -->
+	    <form method="GET" action="{{ route('admin.products') }}" class="space-y-4">
+	        <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+	            {{-- Поиск --}}
+	            <div class="md:col-span-2">
+	                <label class="block text-sm text-gray-600 mb-1">Поиск</label>
+	                <input type="text"
+	                    name="search"
+	                    value="{{ request('search') }}"
+	                    placeholder="Название или артикул…"
+	                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
+	            </div>
 
-            {{-- Категория --}}
-            <div>
-                <label class="block text-sm text-gray-600 mb-1">Категория</label>
-                <select name="kategoriya" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
-                    <option value="">Все</option>
-                    @foreach ($categories as $opt)
-                    <option value="{{ $opt }}" @selected(request('kategoriya')===$opt)>
-                        {{ $opt }}
-                    </option>
-                    @endforeach
-                </select>
-            </div>
+	            {{-- Категория --}}
+	            <div>
+	                <label class="block text-sm text-gray-600 mb-1">Категория</label>
+	                <select name="kategoriya" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200"
+	                        onchange="this.form.elements['tip_tovara'].value=''; this.form.submit();">
+	                    <option value="">Все</option>
+	                    @foreach ($categories as $opt)
+	                    <option value="{{ $opt }}" @selected(request('kategoriya')===$opt)>
+	                        {{ $opt }}
+	                    </option>
+	                    @endforeach
+	                </select>
+	            </div>
 
-            {{-- Поставщик --}}
-            <div>
-                <label class="block text-sm text-gray-600 mb-1">Поставщик</label>
-                <select name="postavshik" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
-                    <option value="">Все</option>
-                    @foreach ($suppliers as $opt)
+	            {{-- Тип товара --}}
+	            <div>
+	                <label class="block text-sm text-gray-600 mb-1">Тип товара</label>
+	                <select name="tip_tovara" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
+	                    <option value="">Все</option>
+	                    @foreach ($productTypes as $opt)
+	                    <option value="{{ $opt }}" @selected(request('tip_tovara')===$opt)>
+	                        {{ $opt }}
+	                    </option>
+	                    @endforeach
+	                </select>
+	            </div>
+
+	            {{-- Поставщик --}}
+	            <div>
+	                <label class="block text-sm text-gray-600 mb-1">Поставщик</label>
+	                <select name="postavshik" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
+	                    <option value="">Все</option>
+	                    @foreach ($suppliers as $opt)
                     <option value="{{ $opt }}" @selected(request('postavshik')===$opt)>
                         {{ $opt }}
                     </option>
@@ -55,12 +69,12 @@
                 </select>
             </div>
 
-            {{-- Производитель --}}
-            <div>
-                <label class="block text-sm text-gray-600 mb-1">Производитель</label>
-                <select name="proizvoditel" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
-                    <option value="">Все</option>
-                    @foreach ($manufacturers as $opt)
+	            {{-- Производитель --}}
+	            <div>
+	                <label class="block text-sm text-gray-600 mb-1">Производитель</label>
+	                <select name="proizvoditel" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
+	                    <option value="">Все</option>
+	                    @foreach ($manufacturers as $opt)
                     <option value="{{ $opt }}" @selected(request('proizvoditel')===$opt)>
                         {{ $opt }}
                     </option>

@@ -7,10 +7,30 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Traits\CommonDataTrait;
 use App\Services\SeoService;
+use Illuminate\Database\Eloquent\Builder;
 
 class CatalogController extends Controller
 {
     use CommonDataTrait;
+
+    protected function applySort(Builder $query, string $sort): void
+    {
+        $sort = trim($sort);
+        $table = (new Product())->getTable();
+
+        $variantMinPriceSql = "(select min(v.price) from {$table} as v where v.tip_stroki = 'variant' and v.naimenovanie = {$table}.naimenovanie)";
+        $sortPriceSql = "(case when {$table}.tip_stroki = 'product' then {$variantMinPriceSql} else {$table}.price end)";
+
+        match ($sort) {
+            'price_asc' => $query->orderByRaw("({$sortPriceSql} is null) asc, {$sortPriceSql} asc")
+                ->orderBy('naimenovanie'),
+            'price_desc' => $query->orderByRaw("({$sortPriceSql} is null) asc, {$sortPriceSql} desc")
+                ->orderBy('naimenovanie'),
+            'new_desc' => $query->orderByDesc('created_at')->orderBy('naimenovanie'),
+            'new_asc' => $query->orderBy('created_at')->orderBy('naimenovanie'),
+            default => $query->orderBy('naimenovanie'),
+        };
+    }
 
     public function index(Request $request)
     {
@@ -164,19 +184,20 @@ class CatalogController extends Controller
             }
         }
 
-        $rangeFilters = [
-            'vysota' => ['vysota_min', 'vysota_max'],
-            'shirina' => ['shirina_min', 'shirina_max'],
-            'glubina' => ['glubina_min', 'glubina_max'],
-            'moshchnost' => ['moshchnost_min', 'moshchnost_max'],
-        ];
-        foreach ($rangeFilters as $field => [$minField, $maxField]) {
-            if ($request->filled($minField)) $productsQuery->where($field, '>=', $request->$minField);
-            if ($request->filled($maxField)) $productsQuery->where($field, '<=', $request->$maxField);
-        }
+	        $rangeFilters = [
+	            'vysota' => ['vysota_min', 'vysota_max'],
+	            'shirina' => ['shirina_min', 'shirina_max'],
+	            'glubina' => ['glubina_min', 'glubina_max'],
+	            'moshchnost' => ['moshchnost_min', 'moshchnost_max'],
+	        ];
+	        foreach ($rangeFilters as $field => [$minField, $maxField]) {
+	            if ($request->filled($minField)) $productsQuery->where($field, '>=', $request->$minField);
+	            if ($request->filled($maxField)) $productsQuery->where($field, '<=', $request->$maxField);
+	        }
 
-        $products = $productsQuery->orderBy('naimenovanie')->paginate($perPage)->withQueryString();
-        $this->setDisplayPrices($products);
+	        $this->applySort($productsQuery, (string) $request->query('sort', ''));
+	        $products = $productsQuery->paginate($perPage)->withQueryString();
+	        $this->setDisplayPrices($products);
 
         $itemList = [
             '@context' => 'https://schema.org',
@@ -221,17 +242,18 @@ class CatalogController extends Controller
                 : 'Поиск по каталогу каминов, топок, печей и аксессуаров в D-Kaminov.',
         ])->canonical()->breadcrumb('Главная', route('home'))->breadcrumb('Поиск');
 
-        $productsQuery = (clone $base)
-            ->when($request->search, function ($q, $s) {
-                return $q->where('naimenovanie', 'like', "%{$s}%")
-                    ->orWhere('sku', 'like', "%{$s}%");
-            })
-            ->when($request->price_min, fn($q, $min) => $q->where('price', '>=', $min))
-            ->when($request->price_max, fn($q, $max) => $q->where('price', '<=', $max));
+	        $productsQuery = (clone $base)
+	            ->when($request->search, function ($q, $s) {
+	                return $q->where('naimenovanie', 'like', "%{$s}%")
+	                    ->orWhere('sku', 'like', "%{$s}%");
+	            })
+	            ->when($request->price_min, fn($q, $min) => $q->where('price', '>=', $min))
+	            ->when($request->price_max, fn($q, $max) => $q->where('price', '<=', $max));
 
-        $products = $productsQuery->orderBy('naimenovanie')->paginate(12)->withQueryString();
-        $this->setDisplayPrices($products);
+	        $this->applySort($productsQuery, (string) $request->query('sort', ''));
+	        $products = $productsQuery->paginate(12)->withQueryString();
+	        $this->setDisplayPrices($products);
 
-        return view('search', compact('products'))->with('seo', $seo);
+	        return view('search', compact('products'))->with('seo', $seo);
     }
 }

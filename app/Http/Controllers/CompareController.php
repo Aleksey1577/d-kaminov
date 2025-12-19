@@ -16,7 +16,11 @@ class CompareController extends Controller
             session(['compare' => $compareIds]);
         }
         $products = Product::whereIn('product_id', $compareIds)->get();
-        return view('compare', compact('products', 'compareIds'));
+        return view('compare', compact('products', 'compareIds'))
+            ->with('breadcrumbs', [
+                ['name' => 'Главная', 'url' => route('home')],
+                ['name' => 'Сравнение', 'url' => null],
+            ]);
     }
 
     public function add(Request $request, $productId)

@@ -239,20 +239,30 @@
     <!-- Модалка "Заказать звонок" -->
     <x-callback-modal />
 
-    <main class="flex-1 shell py-10 space-y-6">
-        @if (session('error'))
-            <div class="surface-quiet border border-red-200 text-red-800 px-4 py-3">
-                {{ session('error') }}
-            </div>
-        @endif
-        @if (session('success'))
-            <div class="surface-quiet border border-green-200 text-green-800 px-4 py-3">
-                {{ session('success') }}
-            </div>
-        @endif
+	    <main class="flex-1 shell py-10 space-y-6">
+	        @if (session('error'))
+	            <div class="surface-quiet border border-red-200 text-red-800 px-4 py-3">
+	                {{ session('error') }}
+	            </div>
+	        @endif
+	        @if (session('success'))
+	            <div class="surface-quiet border border-green-200 text-green-800 px-4 py-3">
+	                {{ session('success') }}
+	            </div>
+	        @endif
 
-        @yield('content')
-    </main>
+	        @php
+	            $breadcrumbItems = [];
+	            if (isset($breadcrumbs) && is_array($breadcrumbs)) {
+	                $breadcrumbItems = $breadcrumbs;
+	            } elseif (isset($seo) && is_object($seo) && method_exists($seo, 'breadcrumbs')) {
+	                $breadcrumbItems = $seo->breadcrumbs();
+	            }
+	        @endphp
+	        <x-breadcrumbs :items="$breadcrumbItems" />
+
+	        @yield('content')
+	    </main>
 
     <footer class="bg-slate-900 text-white mt-10 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-orange/10 via-transparent to-amber-100/10 pointer-events-none"></div>
@@ -320,7 +330,7 @@
                     <h3 class="text-lg font-semibold mb-2 text-white">Контакты</h3>
                     <p class="text-white">Телефон: <a href="tel:+79179535850" class="hover:text-orange-200 text-white font-semibold">+7 (917) 953-58-50</a></p>
                     <p class="text-white">Email: <a href="mailto:info@d-kaminov.com" class="hover:text-orange-200 text-white font-semibold">info@d-kaminov.com</a></p>
-                    <p class="text-white">График: Пн–Пт 10:00–19:00, Сб–Вс по записи</p>
+                    <p class="text-white">График: 10:00–19:30 без выходных</p>
                     <div class="pt-2">
                         <h4 class="text-xs uppercase tracking-widest text-slate-50 mb-1">Юр. данные</h4>
                         <p class="leading-relaxed text-slate-50">

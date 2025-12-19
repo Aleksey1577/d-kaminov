@@ -8,14 +8,41 @@
 )
 
 @section('content')
-<div class="mb-6 space-y-2">
-    <div class="eyebrow">{{ $category ? 'Категория' : 'Каталог' }}</div>
-    <h1 class="section-title">
-        {{ $category ? 'Купить ' . $category : 'Каталог товаров' }}
-    </h1>
-    <p class="section-lead text-base">
-        Актуальные цены, наличие и удобные фильтры по бренду, стоимости и характеристикам.
-    </p>
+<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div class="space-y-2">
+        <div class="eyebrow">{{ $category ? 'Категория' : 'Каталог' }}</div>
+        <h1 class="section-title">
+            {{ $category ? 'Купить ' . $category : 'Каталог товаров' }}
+        </h1>
+        <p class="section-lead text-base">
+            Актуальные цены, наличие и удобные фильтры по бренду, стоимости и характеристикам.
+        </p>
+    </div>
+
+    @if(!($showCategories ?? false))
+        <form method="GET" action="{{ route('catalog') }}" class="flex items-center gap-2 sm:pb-1">
+            @foreach(request()->except(['sort','page']) as $k => $v)
+                @if(is_array($v))
+                    @foreach($v as $vv)
+                        <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                    @endforeach
+                @else
+                    <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                @endif
+            @endforeach
+
+            <label for="sort" class="text-sm text-slate-600 whitespace-nowrap">Сортировка:</label>
+            <select name="sort" id="sort"
+                class="rounded-lg border border-amber-200 px-3 py-2 bg-white focus:border-orange focus:ring focus:ring-orange/20"
+                onchange="this.form.submit()">
+                <option value="" @selected(request()->sort === null || request()->sort === '')>По названию</option>
+                <option value="price_asc" @selected(request()->sort === 'price_asc')>Цена (по возрастанию)</option>
+                <option value="price_desc" @selected(request()->sort === 'price_desc')>Цена (по убыванию)</option>
+                <option value="new_desc" @selected(request()->sort === 'new_desc')>Сначала новые</option>
+                <option value="new_asc" @selected(request()->sort === 'new_asc')>Сначала старые</option>
+            </select>
+        </form>
+    @endif
 </div>
 
 {{-- Режим 1: Плитка категорий --}}

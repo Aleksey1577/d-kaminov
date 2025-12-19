@@ -14,19 +14,23 @@
         </svg>
     </button>
 
-    <div x-show="open || window.innerWidth >= 768" x-cloak
-        class="surface p-6 md:block">
+    <div x-show="open || window.innerWidth >= 768" x-cloak class="surface p-6 md:block">
         <form method="GET" action="{{ route('catalog') }}">
             <div class="space-y-5">
-                {{-- Скрытый category --}}
-                @if(request()->category)
-                <input type="hidden" name="category" value="{{ request()->category }}">
-                @endif
+	                {{-- Скрытый category --}}
+	                @if(request()->category)
+	                <input type="hidden" name="category" value="{{ request()->category }}">
+	                @endif
+	
+	                {{-- Скрытый sort (чтобы сохранялся при сабмите фильтров) --}}
+	                @if(request()->filled('sort'))
+	                    <input type="hidden" name="sort" value="{{ request()->sort }}">
+	                @endif
 
-                {{-- Цена: диапазон от/до --}}
-                <div>
-                    <label class="block text-sm font-semibold text-slate-800 mb-2">Цена, ₽</label>
-                    <div class="flex space-x-2">
+	                {{-- Цена: диапазон от/до --}}
+	                <div>
+	                    <label class="block text-sm font-semibold text-slate-800 mb-2">Цена, ₽</label>
+	                    <div class="flex space-x-2">
                         <input type="number" name="price_min" placeholder="От"
                             class="w-1/2 rounded-lg border border-amber-200 px-3 py-2 focus:border-orange focus:ring focus:ring-orange/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             value="{{ request()->price_min }}">

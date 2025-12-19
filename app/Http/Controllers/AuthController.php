@@ -16,7 +16,11 @@ class AuthController extends Controller
     {
         $categories = $this->getCategories();
         $captchaQuestion = $this->makeCaptcha($request);
-        return view('auth.login', compact('categories', 'captchaQuestion'));
+        return view('auth.login', compact('categories', 'captchaQuestion'))
+            ->with('breadcrumbs', [
+                ['name' => 'Главная', 'url' => route('home')],
+                ['name' => 'Вход', 'url' => null],
+            ]);
     }
 
     public function login(Request $request)
@@ -51,7 +55,11 @@ class AuthController extends Controller
     {
         $categories = $this->getCategories();
         $captchaQuestion = $this->makeCaptcha($request);
-        return view('auth.register', compact('categories', 'captchaQuestion'));
+        return view('auth.register', compact('categories', 'captchaQuestion'))
+            ->with('breadcrumbs', [
+                ['name' => 'Главная', 'url' => route('home')],
+                ['name' => 'Регистрация', 'url' => null],
+            ]);
     }
 
     public function register(Request $request)
@@ -93,7 +101,11 @@ class AuthController extends Controller
 
         $orders = method_exists($user, 'orders') ? $user->orders()->latest()->get() : collect();
 
-        return view('profile', compact('user', 'categories', 'favoritesCount', 'compareCount', 'orders'));
+        return view('profile', compact('user', 'categories', 'favoritesCount', 'compareCount', 'orders'))
+            ->with('breadcrumbs', [
+                ['name' => 'Главная', 'url' => route('home')],
+                ['name' => 'Личный кабинет', 'url' => null],
+            ]);
     }
 
     public function logout(Request $request)

@@ -20,7 +20,12 @@ class OrderController extends Controller
             return redirect()->route('cart')->with('error', 'Ваша корзина пуста');
         }
 
-        return view('checkout', compact('cart'));
+        return view('checkout', compact('cart'))
+            ->with('breadcrumbs', [
+                ['name' => 'Главная', 'url' => route('home')],
+                ['name' => 'Корзина', 'url' => route('cart')],
+                ['name' => 'Оформление заказа', 'url' => null],
+            ]);
     }
 
     public function store(Request $request)
@@ -91,7 +96,13 @@ class OrderController extends Controller
 
     public function thankYou()
     {
-        return view('thank-you');
+        return view('thank-you')
+            ->with('breadcrumbs', [
+                ['name' => 'Главная', 'url' => route('home')],
+                ['name' => 'Корзина', 'url' => route('cart')],
+                ['name' => 'Оформление заказа', 'url' => route('checkout')],
+                ['name' => 'Спасибо за заказ', 'url' => null],
+            ]);
     }
 
     // Страница конкретного заказа для пользователя

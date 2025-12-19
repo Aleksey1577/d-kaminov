@@ -16,6 +16,7 @@ class ProductController extends Controller
         $filters = $request->validate([
             'search'         => 'nullable|string|max:255',
             'kategoriya'     => 'nullable|string|max:255',
+            'tip_tovara'     => 'nullable|string|max:255',
             'postavshik'     => 'nullable|string|max:255',
             'proizvoditel'   => 'nullable|string|max:255',
             'price_min'      => 'nullable|numeric|min:0',
@@ -36,6 +37,9 @@ class ProductController extends Controller
         // Фильтры по равенству
         if (!empty($filters['kategoriya'])) {
             $query->where('kategoriya', $filters['kategoriya']);
+        }
+        if (!empty($filters['tip_tovara'])) {
+            $query->where('tip_tovara', $filters['tip_tovara']);
         }
         if (!empty($filters['postavshik'])) {
             $query->where('postavshik', $filters['postavshik']);
@@ -65,10 +69,20 @@ class ProductController extends Controller
 
         // Справочники для селектов
         $categories    = $this->getDistinctValues('kategoriya');
+        $productTypes = !empty($filters['kategoriya'])
+            ? Product::query()
+                ->where('kategoriya', $filters['kategoriya'])
+                ->whereNotNull('tip_tovara')
+                ->where('tip_tovara', '!=', '')
+                ->distinct()
+                ->orderBy('tip_tovara')
+                ->pluck('tip_tovara')
+                ->toArray()
+            : $this->getDistinctValues('tip_tovara');
         $suppliers     = $this->getDistinctValues('postavshik');
         $manufacturers = $this->getDistinctValues('proizvoditel');
 
-        return view('admin.products.index', compact('products', 'categories', 'suppliers', 'manufacturers'));
+        return view('admin.products.index', compact('products', 'categories', 'productTypes', 'suppliers', 'manufacturers'));
     }
 
     public function create()

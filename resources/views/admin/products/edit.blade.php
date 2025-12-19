@@ -395,6 +395,14 @@
         </div>
     </form>
 </div>
+
+{{-- данные для JS (для логики "категория → тип товара") --}}
+<div id="js-types-by-category"
+    data-json='@json($typesByCategory ?? [])'
+    class="hidden"></div>
+<div id="js-current-type"
+    data-value="{{ e(old('tip_tovara', $product->tip_tovara)) }}"
+    class="hidden"></div>
 @endsection
 
 @section('scripts')
@@ -543,6 +551,53 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     renderGallerySummary();
+
+    /* ---------- Категория → Тип товара ---------- */
+    const typesDiv = document.getElementById('js-types-by-category');
+    const currentTypeDiv = document.getElementById('js-current-type');
+    const selectCategory = document.getElementById('kategoriya');
+    const selectType = document.getElementById('tip_tovara');
+
+    if (typesDiv && currentTypeDiv && selectCategory && selectType) {
+        let map = {};
+        try {
+            map = JSON.parse(typesDiv.dataset.json || '{}');
+        } catch (e) {
+            map = {};
+        }
+
+        let initialType = currentTypeDiv.dataset.value || '';
+
+        function rebuildTypeOptions(resetSelected = false) {
+            const cat = selectCategory.value || '';
+            const list = Array.isArray(map[cat]) ? map[cat] : [];
+
+            const prevValue = resetSelected ? '' : (selectType.value || initialType);
+
+            selectType.innerHTML = '';
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = '— Не выбрано —';
+            selectType.appendChild(emptyOption);
+
+            list.forEach((value) => {
+                const opt = document.createElement('option');
+                opt.value = value;
+                opt.textContent = value;
+                if (value === prevValue) {
+                    opt.selected = true;
+                }
+                selectType.appendChild(opt);
+            });
+        }
+
+        rebuildTypeOptions();
+
+        selectCategory.addEventListener('change', () => {
+            initialType = '';
+            rebuildTypeOptions(true);
+        });
+    }
 });
 </script>
 @endsection

@@ -10,7 +10,39 @@ class CartController extends Controller
     public function index()
     {
         $cart = session()->get('cart', []);
-        return view('cart', compact('cart'));
+
+        $idsToResolve = [];
+        foreach ($cart as $line) {
+            if (!empty($line['slug'])) {
+                continue;
+            }
+            $id = $line['parent_id'] ?? $line['product_id'] ?? null;
+            if ($id !== null) {
+                $idsToResolve[] = (int) $id;
+            }
+        }
+
+        if (!empty($idsToResolve)) {
+            $slugsById = Product::query()
+                ->whereIn('product_id', array_values(array_unique($idsToResolve)))
+                ->pluck('slug', 'product_id');
+
+            foreach ($cart as $k => $line) {
+                if (!empty($line['slug'])) {
+                    continue;
+                }
+                $id = (int) ($line['parent_id'] ?? $line['product_id'] ?? 0);
+                if ($id > 0 && isset($slugsById[$id])) {
+                    $cart[$k]['slug'] = $slugsById[$id];
+                }
+            }
+        }
+
+        return view('cart', compact('cart'))
+            ->with('breadcrumbs', [
+                ['name' => 'Главная', 'url' => route('home')],
+                ['name' => 'Корзина', 'url' => null],
+            ]);
     }
 
     public function add(Request $request, $productId)

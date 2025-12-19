@@ -51,7 +51,11 @@ class StaticPageController extends Controller
     public function privacyPolicy()
     {
         $categories = $this->getCategories();
-        return view('privacy-policy', compact('categories'));
+        return view('privacy-policy', compact('categories'))
+            ->with('breadcrumbs', [
+                ['name' => 'Главная', 'url' => route('home')],
+                ['name' => 'Политика конфиденциальности', 'url' => null],
+            ]);
     }
 
     public function callback(Request $request)

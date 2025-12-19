@@ -7,13 +7,23 @@
 @section('content')
 <div class="p-2 max-w-6xl mx-auto">
     <header class="mb-8 text-center">
-        <h1 class="text-4xl font-bold text-gray-800">Монтаж каминов и печей</h1>
+        <h1 class="text-4xl font-bold text-gray-800">Монтаж и установка печей, каминов и топок в Самаре</h1>
     </header>
 
     <section class="mb-8">
         <p class="text-lg text-gray-700">
-            Добро пожаловать в раздел <span class="font-bold">"Монтаж"</span>! Мы предлагаем профессиональные услуги по установке печей, каминов, биокаминов и электрокаминов. Правильный монтаж гарантирует безопасность, долговечность и эффективность.
+            Добро пожаловать в раздел <span class="font-bold">"Монтаж"</span>! Мы выполняем монтаж печей, монтаж каминов и монтаж/установку топок в Самаре и области — под ключ и с соблюдением норм. Правильный монтаж гарантирует безопасность, долговечность и эффективность.
         </p>
+    </section>
+
+    <section class="mb-8">
+        <h2 class="text-3xl text-center font-semibold text-gray-800 mb-4">Какие работы выполняем</h2>
+        <ul class="list-disc pl-6 text-gray-700 space-y-2">
+            <li>Установка печи (дровяные, печи-камины) и подключение к дымоходу.</li>
+            <li>Установка камина и монтаж облицовки/портала.</li>
+            <li>Монтаж топки (встраиваемые решения), герметизация и проверка тяги.</li>
+            <li>Монтаж дымохода, проходные узлы, теплоизоляция и пусконаладка.</li>
+        </ul>
     </section>
 
     <section class="mb-8">
@@ -89,11 +99,15 @@
 {
   "@context": "https://schema.org",
   "@type": "Service",
-  "serviceType": "Монтаж каминов и печей под ключ",
+  "serviceType": "Монтаж и установка печей, каминов и топок в Самаре",
   "provider": {
     "@type": "Organization",
     "name": "D-Kaminov"
   },
+  "areaServed": [
+    { "@type": "City", "name": "Самара" },
+    { "@type": "AdministrativeArea", "name": "Самарская область" }
+  ],
   "description": "{{ $seoData['description'] }}"
 }
 </script>
