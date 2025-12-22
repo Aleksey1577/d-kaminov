@@ -43,7 +43,7 @@ class AuthController extends Controller
                 return redirect()->intended('/admin');
             }
 
-            return redirect()->intended('/profile');
+            return redirect()->intended(route('profile'));
         }
 
         return back()->withErrors([
@@ -85,12 +85,12 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->forget('captcha_answer');
 
-        return redirect('/profile');
+        return redirect()->route('profile');
     }
 
     public function profile()
     {
-        /** @var \App\Models\User $user */
+
         $user = Auth::user();
 
         $categories      = $this->getCategories();
@@ -123,7 +123,6 @@ class AuthController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . Auth::id()],
         ]);
 
-        /** @var \App\Models\User $user */
         $user = Auth::user();
         $user->fill($validated)->save();
 

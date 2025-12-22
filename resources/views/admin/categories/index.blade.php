@@ -1,4 +1,4 @@
-@extends('layouts.admin') 
+@extends('layouts.admin')
 
 @section('title', 'Управление категориями')
 
@@ -37,7 +37,7 @@
                                 <td class="border-t p-3 align-middle">
                                     <div class="flex items-center gap-3">
                                         <a href="{{ route('admin.categories.edit', $category) }}" class="text-blue-600 hover:underline">Редактировать</a>
-                                        <form action="{{ route('admin.categories.destroy', $category) }}" 
+                                        <form action="{{ route('admin.categories.destroy', $category) }}"
                                               method="POST"
                                               class="inline"
                                               onsubmit="return confirm('Удалить категорию?');">

@@ -44,7 +44,6 @@ class OrderController extends Controller
             return redirect()->route('cart')->with('error', 'Корзина пуста');
         }
 
-        // Подсчёт суммы
         $total = collect($cart)->sum(function ($item) {
             $price = (float) ($item['price'] ?? 0);
             $qty   = (int)   ($item['quantity'] ?? 0);
@@ -54,7 +53,7 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
             $order = Order::create([
-                'user_id'        => Auth::id(), // null, если гость
+                'user_id'        => Auth::id(),
                 'name'           => $validated['name'],
                 'email'          => $validated['email'],
                 'phone'          => $validated['phone'],
@@ -105,15 +104,13 @@ class OrderController extends Controller
             ]);
     }
 
-    // Страница конкретного заказа для пользователя
     public function show(Order $order)
     {
-        // Разрешаем смотреть заказ, только если это его владелец
+
         if (!Auth::check() || $order->user_id !== Auth::id()) {
             abort(403);
         }
 
-        // подтянем позиции
         $order->load('items');
 
         return view('orders.show', compact('order'));

@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-   // app/Http/Controllers/Admin/OrderController.php
 
 public function index(Request $request)
 {

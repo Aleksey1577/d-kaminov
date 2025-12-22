@@ -15,58 +15,64 @@ class SeoService
         'robots'      => 'index,follow',
         'canonical'   => null,
         'locale'      => 'ru_RU',
-        'site_name'   => 'D-Kaminov',
+        'site_name'   => 'Дом каминов',
         'twitter'     => '@dkaminov',
-        'image'       => null, // абсолютный URL к превью (OG/Twitter)
-        'hreflangs'   => [],   // [['lang' => 'ru', 'url' => '...']]
-        'breadcrumbs' => [],   // [['name' => 'Каталог', 'url' => url('/catalog')]]
-        'og'          => [],   // доп. OG-поля
-        'jsonld'      => [],   // дополнительные JSON-LD блоки
+        'image'       => null,
+        'logo'        => null,
+        'hreflangs'   => [],
+        'breadcrumbs' => [],
+        'og'          => [],
+        'jsonld'      => [],
     ];
 
-    /** Дефолты для страниц */
     protected array $pages = [
         'home' => [
-            'title'       => 'D-Kaminov — Камины и печи в Самаре | Купить камин под ключ',
-            'description' => 'D-Kaminov: топки, печи, биокамины, электрокамины и аксессуары. Монтаж под ключ по Самаре и области.',
-            'keywords'    => 'дом каминов, дом каминов официальный сайт, d-kaminov, дом каминов сайт, дом каминов самара',
+            'title'       => 'Дом каминов — камины и печи в Самаре',
+            'description' => 'Дом каминов: топки, печи, биокамины, электрокамины и аксессуары. Монтаж под ключ по Самаре и области.',
+            'keywords'    => 'дом каминов, дом каминов Самара, камины Самара, печи Самара, биокамины, электрокамины, топки, монтаж каминов',
+        ],
+        'catalog' => [
+            'title'       => 'Каталог Дом каминов — камины и печи',
+            'description' => 'Каталог Дом каминов: камины, топки, печи и аксессуары. Фильтры по цене, бренду и наличию, доставка и монтаж под ключ.',
+            'keywords'    => 'дом каминов каталог, каталог каминов, каталог печей, дом каминов Самара, камины Самара, печи Самара, биокамины, электрокамины, топки, дымоходы, купить камин, купить печь, Дом каминов',
         ],
         'delivery' => [
-            'title'       => 'Доставка каминов и печей по Самаре и области | D-Kaminov',
-            'description' => 'Быстрая и бережная доставка каминов, печей и комплектующих по Самаре и области. Самовывоз и помощь в подъёме.',
-            'keywords'    => 'доставка каминов Самара, доставка печей Самара, доставка D-Kaminov',
+            'title'       => 'Доставка Дом каминов по Самаре и области',
+            'description' => 'Доставка Дом каминов: бережно привезём камины, печи и комплектующие по Самаре и области. Самовывоз и помощь в подъёме.',
+            'keywords'    => 'доставка дом каминов, доставка каминов Самара, доставка печей Самара, доставка Дом каминов',
         ],
         'montage' => [
-            'title'       => 'Монтаж и установка печей, каминов и топок в Самаре | D-Kaminov',
-            'description' => 'Профессиональный монтаж и установка печей, каминов и топок под ключ в Самаре и области. Выезд на объект, соблюдение норм, гарантия.',
-            'keywords'    => 'монтаж печи Самара, монтаж каминов Самара, установка печи Самара, установка камина Самара, монтаж топок Самара, установка топок Самара',
+            'title'       => 'Монтаж Дом каминов в Самаре',
+            'description' => 'Монтаж Дом каминов: профессиональная установка печей, каминов и топок в Самаре и области. Выезд на объект, соблюдение норм, гарантия.',
+            'keywords'    => 'монтаж дом каминов, монтаж печи Самара, монтаж каминов Самара, установка печи Самара, установка камина Самара, монтаж топок Самара',
         ],
         'portfolio' => [
-            'title'       => 'Наши работы — установленные камины и печи | D-Kaminov',
-            'description' => 'Фото и кейсы: профессиональный монтаж каминов и печей под ключ. 15+ лет опыта.',
-            'keywords'    => 'наши работы, фото каминов, проекты каминов, монтаж каминов, работы дом каминов',
+            'title'       => 'Портфолио Дом каминов — наши работы',
+            'description' => 'Портфолио Дом каминов: фото и кейсы установки каминов и печей под ключ. Более 15 лет опыта.',
+            'keywords'    => 'портфолио дом каминов, наши работы дом каминов, фото каминов, проекты каминов, монтаж каминов, Дом каминов',
         ],
         'contacts' => [
-            'title'       => 'Контакты | D-Kaminov — Камины и печи в Самаре',
-            'description' => 'Телефон, email и адрес в Самаре. Работаем ежедневно с 9:00 до 19:00.',
-            'keywords'    => 'контакты дом каминов, телефон D-Kaminov, адрес каминов Самара, телефон дом каминов, адрес дом каминов',
+            'title'       => 'Контакты Дом каминов в Самаре',
+            'description' => 'Контакты Дом каминов в Самаре: адрес, телефон, email, график работы и схема проезда.',
+            'keywords'    => 'контакты дом каминов, дом каминов Самара, адрес дом каминов, телефон дом каминов, Дом каминов контакты, адрес каминов Самара',
         ],
     ];
 
     public function getProduct(array $data): array
     {
-        $name = $data['naimenovanie'] ?? '';
+        $name = trim((string) ($data['naimenovanie'] ?? ''));
+        $defaultTitle = $name !== ''
+            ? $name . ' — купить в Дом каминов'
+            : ($this->defaults['title'] ?? 'Дом каминов');
+        $defaultDesc = $name !== ''
+            ? 'Купить ' . $name . ' в Дом каминов в Самаре. Доставка по Самаре и России. Гарантия.'
+            : ($this->defaults['description'] ?? '');
+        $defaultKeys = $name !== '' ? $this->buildProductKeywords($name) : ($this->defaults['keywords'] ?? '');
 
-        $title = $data['seo_title']
-            ?? ($name ? $name . ' | Купить в D-Kaminov' : ($this->defaults['title'] ?? 'D-Kaminov'));
-        $desc  = $data['seo_description']
-            ?? ($name
-                ? 'Купить ' . $name . ' в D-Kaminov. Доставка по Самаре и России. Гарантия.'
-                : ($this->defaults['description'] ?? '')
-            );
-        $keys  = $data['seo_keywords'] ?? ($this->defaults['keywords'] ?? '');
+        $title = $data['seo_title'] ?? $defaultTitle;
+        $desc  = $data['seo_description'] ?? $defaultDesc;
+        $keys  = $data['seo_keywords'] ?? $defaultKeys;
 
-        // Нормируем длины под мета-теги
         $title = \Illuminate\Support\Str::limit(trim($title), 60);
         $desc  = \Illuminate\Support\Str::limit(strip_tags(trim($desc)), 160);
 
@@ -77,15 +83,13 @@ class SeoService
         ];
     }
 
-    /** Глобальные дефолты (fallback) */
     protected array $defaults = [
-        'title'       => 'D-Kaminov — Камины и печи в Самаре',
+        'title'       => 'Дом каминов — Камины и печи в Самаре',
         'description' => 'Интернет-магазин каминов, печей и аксессуаров в Самаре. Профессиональный монтаж под ключ.',
         'keywords'    => 'камины Самара, печи, биокамины, электрокамины, топки, аксессуары, монтаж каминов',
-        'image'       => '/img/og-default.jpg', // положи файл в public/img/og-default.jpg
+        'image'       => '/assets/placeholder.png',
+        'logo'        => '/assets/header/logo.svg',
     ];
-
-    /* ------------------------ БАЗОВЫЕ СЕТТЕРЫ ------------------------ */
 
     public function forPage(string $key, array $override = []): static
     {
@@ -101,9 +105,17 @@ class SeoService
 
         $name = (string) (Arr::get($p, 'naimenovanie') ?? '');
 
-        $title = (string) (Arr::get($p, 'seo_title') ?: ($name ? $name . ' | Купить в D-Kaminov' : $this->defaults['title']));
-        $desc  = (string) (Arr::get($p, 'seo_description') ?: ($name ? 'Купить ' . $name . ' в D-Kaminov. Доставка по Самаре и России. Гарантия.' : $this->defaults['description']));
-        $keys  = (string) (Arr::get($p, 'seo_keywords') ?: $this->defaults['keywords']);
+        $defaultTitle = $name !== ''
+            ? $name . ' — купить в Дом каминов'
+            : $this->defaults['title'];
+        $defaultDesc = $name !== ''
+            ? 'Купить ' . $name . ' в Дом каминов в Самаре. Доставка по Самаре и России. Гарантия.'
+            : $this->defaults['description'];
+        $defaultKeys = $name !== '' ? $this->buildProductKeywords($name) : $this->defaults['keywords'];
+
+        $title = (string) (Arr::get($p, 'seo_title') ?: $defaultTitle);
+        $desc  = (string) (Arr::get($p, 'seo_description') ?: $defaultDesc);
+        $keys  = (string) (Arr::get($p, 'seo_keywords') ?: $defaultKeys);
 
         $image = (string) (Arr::get($p, 'image_abs') ?: Arr::get($p, 'image') ?: $this->absolute($this->defaults['image']));
         $image = $this->absolute($image);
@@ -158,7 +170,6 @@ class SeoService
             ]);
         }
 
-        // JSON-LD Product
         $productLd = [
             '@context'    => 'https://schema.org',
             '@type'       => 'Product',
@@ -177,7 +188,7 @@ class SeoService
 
     public function getPage(string $page): array
     {
-        // Вернёт массив как раньше: ['title' => ..., 'description' => ..., 'keywords' => ...]
+
         $data = array_merge($this->defaults, $this->pages[$page] ?? []);
         return [
             'title'       => $data['title']       ?? $this->defaults['title'],
@@ -231,9 +242,6 @@ class SeoService
         return $this;
     }
 
-    /**
-     * @return array<int, array{name: string, url: string|null}>
-     */
     public function breadcrumbs(): array
     {
         return $this->state['breadcrumbs'];
@@ -253,13 +261,16 @@ class SeoService
 
     public function fill(array $data): static
     {
-        foreach (['title', 'description', 'keywords', 'image'] as $k) {
-            if (!empty($data[$k])) $this->state[$k] = $k === 'image' ? $this->absolute($data[$k]) : $data[$k];
+        foreach (['title', 'description', 'keywords', 'image', 'logo'] as $k) {
+            if (empty($data[$k])) {
+                continue;
+            }
+            $this->state[$k] = in_array($k, ['image', 'logo'], true)
+                ? $this->absolute($data[$k])
+                : $data[$k];
         }
         return $this;
     }
-
-    /* ------------------------ РЕНДЕР В <head> ------------------------ */
 
     public function render(): string
     {
@@ -269,14 +280,31 @@ class SeoService
 
         $canonical = $this->state['canonical'] ?: URL::current();
         $image     = $this->state['image']     ?: $this->absolute($this->defaults['image']);
+        $logo      = $this->state['logo']      ?: $this->absolute($this->defaults['logo']);
 
-        // базовые JSON-LD: Organization, WebSite + SearchAction, BreadcrumbList
         $org = [
             '@context' => 'https://schema.org',
             '@type'    => 'Organization',
             'name'     => $this->state['site_name'],
+            '@id'      => url('/#organization'),
             'url'      => url('/'),
-            'logo'     => $image,
+            'logo'     => $logo,
+            'telephone' => '+79179535850',
+            'email'     => 'info@d-kaminov.com',
+            'address'   => [
+                '@type'           => 'PostalAddress',
+                'streetAddress'   => 'ТЦ Интермебель, Московское шоссе 16 км, 1в ст2, 2 этаж',
+                'addressLocality' => 'Самара',
+                'addressRegion'   => 'Самарская область',
+                'postalCode'      => '443095',
+                'addressCountry'  => 'RU',
+            ],
+            'contactPoint' => [
+                '@type' => 'ContactPoint',
+                'telephone' => '+79179535850',
+                'email' => 'info@d-kaminov.com',
+                'contactType' => 'customer service',
+            ],
         ];
         $site = [
             '@context' => 'https://schema.org',
@@ -285,8 +313,8 @@ class SeoService
             'url'      => url('/'),
             'potentialAction' => [
                 '@type'       => 'SearchAction',
-                'target'      => url('/search') . '?q={q}',
-                'query-input' => 'required name=q',
+                'target'      => url('/poisk') . '?search={search_term_string}',
+                'query-input' => 'required name=search_term_string',
             ],
         ];
         $breadcrumbs = $this->state['breadcrumbs'];
@@ -313,7 +341,6 @@ class SeoService
             $json .= '<script type="application/ld+json">' . json_encode($blk, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "</script>\n";
         }
 
-        // OG/Twitter
         $og = array_merge([
             'og:title'       => $t,
             'og:description' => $d,
@@ -347,8 +374,6 @@ class SeoService
         return implode("\n", $tags) . "\n" . $json;
     }
 
-    /* ------------------------ ВСПОМОГАТЕЛЬНЫЕ ------------------------ */
-
     protected function clean(?string $v): string
     {
         $v = (string) ($v ?? '');
@@ -362,5 +387,18 @@ class SeoService
             return $path;
         }
         return url($path);
+    }
+
+    protected function buildProductKeywords(string $name): string
+    {
+        $base = array_filter(array_map('trim', explode(',', (string) ($this->defaults['keywords'] ?? ''))));
+        $keywords = array_merge([
+            $name . ' купить',
+            $name . ' Самара',
+            'дом каминов',
+            'дом каминов Самара',
+        ], $base);
+        $keywords = array_values(array_unique(array_filter(array_map('trim', $keywords))));
+        return implode(', ', $keywords);
     }
 }

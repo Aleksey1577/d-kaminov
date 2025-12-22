@@ -1,5 +1,3 @@
-{{-- resources/views/components/short-characteristics.blade.php --}}
-
 <div class="surface-quiet p-4 sm:p-5 mb-6">
     <h2 class="text-lg sm:text-xl font-semibold text-slate-900 mb-3 sm:mb-4">Характеристики</h2>
     <div class="space-y-2.5 sm:space-y-3">
@@ -29,7 +27,6 @@
         @endif
     </div>
 
-    <!-- Кнопка для просмотра всех характеристик -->
     <button
         type="button"
         class="mt-4 w-full btn-ghost justify-center"

@@ -1,7 +1,7 @@
-{{-- resources/views/profile.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Личный кабинет')
+@section('seo_robots', 'noindex,follow')
 
 @section('content')
 <div class="shell space-y-8">
@@ -17,7 +17,6 @@
         </form>
     </div>
 
-    {{-- Быстрые показатели --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="surface p-4 flex items-center gap-3">
             <div class="w-12 h-12 rounded-2xl bg-orange/10 text-orange flex items-center justify-center text-lg font-bold">
@@ -58,7 +57,7 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {{-- Профиль --}}
+
         <div class="surface p-6 space-y-4 lg:col-span-1">
             <div>
                 <div class="eyebrow">Профиль</div>
@@ -81,7 +80,6 @@
             <a href="#edit-profile" class="btn-primary w-full text-center">Редактировать профиль</a>
         </div>
 
-        {{-- Заказы --}}
         <div class="surface p-6 space-y-4 lg:col-span-2">
             <div class="flex items-center justify-between">
                 <div>
@@ -122,8 +120,7 @@
                                     </td>
                                     <td class="py-3 text-slate-500">
                                         <span class="text-xs">Скоро</span>
-                                        {{-- Добавьте ссылку на страницу заказа, когда будет готов маршрут --}}
-                                        {{-- <a href="{{ route('order.show', $order) }}" class="text-orange font-semibold hover:underline">Подробнее</a> --}}
+
                                     </td>
                                 </tr>
                             @endforeach
@@ -134,7 +131,6 @@
         </div>
     </div>
 
-    {{-- Редактирование профиля --}}
     <div id="edit-profile" class="surface p-6 space-y-5">
         <div>
             <div class="eyebrow">Редактирование</div>

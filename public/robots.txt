@@ -1,13 +1,25 @@
 User-agent: *
 # Закрываем админку
-Disallow: /admin/
+Disallow: /admin
 
 # Закрываем системные маршруты
+Disallow: /vhod
+Disallow: /registraciya
+Disallow: /vyhod
+Disallow: /kabinet
+Disallow: /password/
+Disallow: /korzina
+Disallow: /izbrannoe
+Disallow: /sravnenie
+Disallow: /oformlenie-zakaza
+Disallow: /spasibo
+Disallow: /politika-konfidencialnosti
+
+# Старые URL (редиректы)
 Disallow: /login
 Disallow: /register
 Disallow: /logout
 Disallow: /profile
-Disallow: /password/
 Disallow: /cart
 Disallow: /favorites
 Disallow: /compare
@@ -16,6 +28,8 @@ Disallow: /thank-you
 Disallow: /privacy-policy
 
 # Закрываем API-обработчики, поиск, формы
+Disallow: /poisk
+Disallow: /obratnyj-zvonok
 Disallow: /search
 Disallow: /callback
 
@@ -33,3 +47,4 @@ Allow: /
 
 # Карта сайта
 Sitemap: https://d-kaminov.com/sitemap.xml
+Host: d-kaminov.com

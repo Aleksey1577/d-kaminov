@@ -1,5 +1,3 @@
-{{-- resources/views/components/product-price.blade.php --}}
-
 <div class="surface p-5 sm:p-6 md:p-7 mb-6">
     @php
         // Стартовая цена (если есть варианты — берём либо текущий вариант, либо первый)
@@ -14,7 +12,6 @@
         }
     @endphp
 
-    {{-- Цена + наличие --}}
     <div class="text-center mb-3 sm:mb-4">
         <p id="price"
            data-role="product-price"
@@ -35,7 +32,6 @@
         @endif
     </div>
 
-    {{-- Рейтинг (демо) --}}
     <div class="flex items-center justify-center mb-5">
         <div class="flex text-amber-400">
             @for ($i = 1; $i <= 5; $i++)
@@ -48,7 +44,6 @@
         <span class="ml-2 text-sm text-slate-500">4.5 (12 отзывов)</span>
     </div>
 
-    {{-- Форма добавления в корзину --}}
     <form action="{{ route('cart.add', $product) }}" method="POST" class="mb-4" id="add-to-cart-form">
         @csrf
 
@@ -105,7 +100,6 @@
         $inCompare = in_array($product->product_id, session('compare', []));
     @endphp
 
-    {{-- Действия: сравнить / избранное --}}
     <div class="mt-4 flex flex-wrap gap-2">
         <form
             action="{{ $inCompare ? route('compare.remove', $product->product_id) : route('compare.add', $product->product_id) }}"
@@ -139,19 +133,17 @@
 
     </div>
 
-    {{-- Доп. инфо --}}
     <div class="text-center pt-4 mb-4 text-xs text-slate-500">
         Бесплатная доставка по Самаре от 5000 ₽
     </div>
 
-    {{-- Контакты / консультация --}}
     <div class="mt-4 pt-4 border-t border-amber-100">
         <p class="text-xs text-slate-500 mb-3">
             Нужна помощь с выбором или есть вопросы по товару?
         </p>
 
         <div class="flex flex-col sm:flex-row gap-2">
-            {{-- Позвонить --}}
+
             <a href="tel:+79198055747"
                class="w-full sm:flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-emerald-300 text-emerald-700 bg-white px-3 py-2.5 text-xs sm:text-sm font-semibold hover:bg-emerald-50 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -162,7 +154,6 @@
                 <span class="sm:hidden">Звонок</span>
             </a>
 
-            {{-- Telegram --}}
             <a href="https://t.me/Dom_Kaminov63"
                target="_blank"
                rel="noopener noreferrer"

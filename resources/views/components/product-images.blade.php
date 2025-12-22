@@ -1,5 +1,3 @@
-{{-- resources/views/components/product-images.blade.php --}}
-
 @php
     $images = [];
 
@@ -23,7 +21,7 @@
         }
     }
 
-    $placeholder = asset('images/placeholder.png');
+    $placeholder = asset('assets/placeholder.png');
 @endphp
 
 <div
@@ -48,7 +46,7 @@
     }'
     @variant-change.window="setMainImage($event.detail.image)"
 >
-    {{-- Основное изображение --}}
+
     <div class="w-full h-72 sm:h-96 surface-quiet flex items-center justify-center mb-3 sm:mb-4 overflow-hidden">
         <img
             src="{{ $images[0] ?? $placeholder }}"
@@ -61,7 +59,6 @@
         >
     </div>
 
-    {{-- Галерея превью --}}
     @if(count($images))
         <div class="flex space-x-3 overflow-x-auto px-1 py-3 sm:py-4 -mx-1 sm:mx-0">
             <template x-for="(image, index) in images" :key="index">

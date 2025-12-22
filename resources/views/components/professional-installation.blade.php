@@ -1,4 +1,3 @@
-{{-- resources/views/components/professional-installation.blade.php --}}
 <div class="section p-6 sm:p-8 md:p-10 mb-12">
     <div class="text-center">
         <div class="eyebrow inline-flex">Монтаж</div>
@@ -31,7 +30,7 @@
         <div class="grid md:grid-cols-3 gap-6 mt-8">
             @foreach($items as $item)
                 <div class="surface hover:-translate-y-1 transition-transform duration-200 p-6 text-left">
-                    {{-- Нейтральный контейнер под иконку --}}
+
                     <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center mb-4">
                         @switch($item['icon'])
                             @case('shield-check')

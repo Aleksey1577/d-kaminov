@@ -51,10 +51,9 @@ class CompareController extends Controller
     {
         $product = Product::where('product_id', $productId)->firstOrFail();
 
-        // Улучшенная проверка: пропускаем если _method = DELETE или AJAX POST
         if ($request->method() !== 'DELETE' && $request->input('_method') !== 'DELETE') {
             if ($request->ajax()) {
-                return response()->json(['error' => 'Неверный метод запроса'], 400); // 400 вместо 405 для AJAX
+                return response()->json(['error' => 'Неверный метод запроса'], 400);
             }
             return redirect()->back()->with('error', 'Неверный метод запроса');
         }

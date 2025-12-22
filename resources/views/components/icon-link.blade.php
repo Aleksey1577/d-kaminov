@@ -1,4 +1,3 @@
-{{-- resources/views/components/icon-link.blade.php --}}
 @props([
     'href',
     'icon',
@@ -19,7 +18,6 @@
         <span class="text-xs text-gray-700 group-hover:text-orange">{{ $text }}</span>
     @endif
 
-    {{-- Бейдж ВСЕГДА в DOM; скрываем, если 0 --}}
     <span
         class="{{ $badgeClass }} absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-600 text-white rounded-full text-xs px-1.5 py-0.5 {{ $badge > 0 ? '' : 'hidden' }}"
         data-badge="{{ $role }}"

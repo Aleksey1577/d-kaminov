@@ -1,5 +1,5 @@
 <div class="surface overflow-hidden flex flex-col h-full transition-transform duration-200 hover:-translate-y-0.5">
-    <!-- Изображение товара -->
+
     <a href="{{ route('product', $product->slug) }}" class="block flex-grow">
         <div class="relative w-full h-64 bg-white flex items-center justify-center">
             <img
@@ -12,20 +12,19 @@
     </a>
 
     <div class="p-5 flex flex-col gap-3">
-        <!-- Наименование -->
+
         <a href="{{ route('product', $product->slug) }}" class="block">
             <h3 class="text-lg font-semibold leading-tight text-slate-900 hover:text-orange line-clamp-2">
                 {{ $product->naimenovanie }}
             </h3>
         </a>
 
-        <!-- Чекбокс сравнения -->
         <form
             class="compare-form"
             action="{{ in_array($product->product_id, session('compare', [])) ? route('compare.remove', $product->product_id) : route('compare.add', $product->product_id) }}"
             method="POST"
             data-is-compared="{{ in_array($product->product_id, session('compare', [])) ? 'true' : 'false' }}"
-            data-add-url="{{ route('compare.add', $product->product_id) }}" 
+            data-add-url="{{ route('compare.add', $product->product_id) }}"
             data-remove-url="{{ route('compare.remove', $product->product_id) }}">
             @csrf
             @if (in_array($product->product_id, session('compare', [])))
@@ -40,16 +39,14 @@
             </label>
         </form>
 
-        <!-- Блок с ценой и кнопками -->
         <div class="flex items-center justify-between pt-3 border-t border-amber-100">
-            <!-- Цена -->
+
             <span class="text-2xl font-bold text-slate-900">
                 {{ number_format(floor($product->display_price ?? 0), 0, '', '') }} ₽
             </span>
 
-            <!-- Кнопки действий -->
             <div class="flex items-center gap-2">
-                <!-- Кнопка избранного -->
+
                 <form
                     class="favorites-form"
                     action="{{ in_array($product->product_id, session('favorites', [])) ? route('favorites.remove', $product->product_id) : route('favorites.add', $product) }}"
@@ -71,7 +68,6 @@
                     </button>
                 </form>
 
-                <!-- Кнопка корзины -->
                 <form action="{{ route('cart.add', $product) }}"
                     method="POST"
                     onsubmit="sessionStorage.setItem('scrollPos', window.pageYOffset);">

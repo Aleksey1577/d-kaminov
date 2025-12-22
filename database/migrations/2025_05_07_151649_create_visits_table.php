@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('user_agent')->nullable();
             $table->string('country')->nullable();
             $table->string('country_code', 2)->nullable();
-            $table->string('device_type')->nullable(); // desktop, mobile, tablet
+            $table->string('device_type')->nullable();
             $table->string('url')->nullable();
             $table->timestamps();
         });

@@ -87,4 +87,3 @@ class TelegramNotifier
         return $this->sendMessage(implode("\n", $lines));
     }
 }
-

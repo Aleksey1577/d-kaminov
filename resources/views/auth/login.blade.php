@@ -1,9 +1,9 @@
-{{-- resources/views/auth/login.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Вход')
-@section('seo_title', 'Вход в аккаунт | D-Kaminov')
-@section('seo_description', 'Авторизация в интернет-магазине каминов и печей D-Kaminov.')
+@section('seo_title', 'Вход в аккаунт | Дом каминов')
+@section('seo_description', 'Авторизация в интернет-магазине каминов и печей Дом каминов.')
+@section('seo_robots', 'noindex,follow')
 
 @section('content')
     <div class="min-h-[70vh] flex items-center justify-center">

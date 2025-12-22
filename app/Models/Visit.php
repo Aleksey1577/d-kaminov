@@ -19,9 +19,6 @@ class Visit extends Model
         'url',
     ];
 
-    /**
-     * Связь с пользователем (один визит принадлежит одному пользователю).
-     */
     public function user()
     {
         return $this->belongsTo(User::class);

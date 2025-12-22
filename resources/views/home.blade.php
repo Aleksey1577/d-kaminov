@@ -1,4 +1,3 @@
-{{-- resources/views/home.blade.php --}}
 @extends('layouts.app')
 
 @section('seo_title', $seoData['title'])
@@ -8,16 +7,16 @@
 @section('title', 'Главная')
 
 @section('content')
-<!-- Hero -->
+
 <div class="section p-6 sm:p-8 md:p-10 mb-12">
     <div class="grid lg:grid-cols-2 gap-8 items-center">
         <div class="space-y-5">
-            <div class="eyebrow">D-Kaminov · Самара</div>
+            <div class="eyebrow">Дом каминов · Самара</div>
             <h1 class="section-title">
-                Камины, печи и монтаж <span class="text-orange">под ключ</span>
+                Дом каминов: камины, печи и монтаж <span class="text-orange">под ключ</span>
             </h1>
             <p class="section-lead">
-                Проектируем, поставляем и устанавливаем оборудование с 2010 года.
+                Дом каминов проектирует, поставляет и устанавливает оборудование с 2010 года.
                 От уютных биокаминов до сложных дымоходных систем — всё делаем силами собственной команды.
             </p>
             <div class="flex flex-wrap gap-3">
@@ -52,7 +51,7 @@
                         $image = $isAbsolute ? $rawImage : asset(ltrim($rawImage, '/'));
                     }
                     $link = $slide->category
-                        ? route('catalog', ['category' => $slide->category])
+                        ? route('catalog', ['category' => \Illuminate\Support\Str::slug($slide->category)])
                         : route('catalog');
                     return [
                         'title' => (string) ($slide->title ?? ''),
@@ -129,7 +128,6 @@
     </div>
 </div>
 
-{{-- Категории --}}
 @php
 // Желаемый порядок отображения категорий
 $desiredOrder = [
@@ -183,10 +181,10 @@ $categoryImages = [
             @php
                 $imagePath = $categoryImages[$category['name']]
                     ?? $category['image_url']
-                    ?? 'images/placeholder.png';
+                    ?? 'assets/placeholder.png';
             @endphp
 
-            <a href="/catalog?category={{ urlencode($category['name']) }}"
+            <a href="{{ route('catalog', ['category' => $category['slug'] ?? \Illuminate\Support\Str::slug($category['name'])]) }}"
                 class="surface overflow-hidden hover:-translate-y-1 transition-transform duration-200 flex flex-col">
                 <div class="w-full h-48 bg-white flex items-center justify-center">
                     <img src="{{ asset($imagePath) }}"
@@ -204,43 +202,7 @@ $categoryImages = [
     </div>
 </div>
 
-
-<!-- Партнеры -->
 <x-partners />
 
 <x-professional-installation />
 @endsection
-
-@push('structured-data')
-<script type="application/ld+json">
-    {
-        "@context": "https://schema.org ",
-        "@type": "WebSite",
-        "name": "D-Kaminov",
-        "url": "{{ route('home') }}",
-        "description": "{{ $seoData['description'] }}",
-        "keywords": "{{ $seoData['keywords'] }}",
-        "publisher": {
-            "@type": "Organization",
-            "name": "D-Kaminov",
-            "logo": {
-                "@type": "ImageObject",
-                "url": "{{ asset('img/logo.png') }}"
-            },
-            "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "ТЦ Интермебель, Московское шоссе 16 км, 1в ст2, 2 этаж",
-                "addressLocality": "Самара",
-                "postalCode": "443099",
-                "addressCountry": "RU"
-            },
-            "contactPoint": {
-                "@type": "ContactPoint",
-                "telephone": "+79179535850",
-                "email": "info@d-kaminov.com",
-                "contactType": "customer service"
-            }
-        }
-    }
-</script>
-@endpush

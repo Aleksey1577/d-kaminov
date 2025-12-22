@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    // Метод для обработки общей логики получения данных
+
     private function handleCategoryData(Request $request, Category $category = null)
     {
         $data = $request->validate([

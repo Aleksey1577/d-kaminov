@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
 @section('title', 'Корзина')
-@section('seo_title', 'Корзина товаров | D-Kaminov')
-@section('seo_description', 'Проверьте и оформите заказ на камины, печи и аксессуары в интернет-магазине D-Kaminov.')
+@section('seo_title', 'Корзина товаров | Дом каминов')
+@section('seo_description', 'Проверьте и оформите заказ на камины, печи и аксессуары в интернет-магазине Дом каминов.')
+@section('seo_robots', 'noindex,follow')
 
 @section('content')
 @php
@@ -33,7 +34,6 @@
     @else
         <div class="surface overflow-hidden">
 
-            {{-- Заголовки на десктопе --}}
             <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-amber-50/60 text-sm font-semibold text-slate-700">
                 <div class="col-span-6">Товар</div>
                 <div class="col-span-2 text-right">Цена</div>
@@ -59,11 +59,10 @@
 
                     <div class="grid grid-cols-12 gap-4 px-4 md:px-6 py-4 items-center">
 
-                        {{-- Товар --}}
                         <div class="col-span-12 md:col-span-6 flex items-center gap-4">
                             @if($slug)
                                 <a href="{{ route('product', $slug) }}" class="flex-shrink-0">
-                                    <img src="{{ $item['image_url'] ?? asset('images/placeholder.png') }}"
+                                    <img src="{{ $item['image_url'] ?? asset('assets/placeholder.png') }}"
                                          class="w-16 h-16 object-contain rounded border bg-white"
                                          alt=""
                                          loading="lazy"
@@ -71,7 +70,7 @@
                                 </a>
                             @else
                                 <div class="flex-shrink-0">
-                                    <img src="{{ $item['image_url'] ?? asset('images/placeholder.png') }}"
+                                    <img src="{{ $item['image_url'] ?? asset('assets/placeholder.png') }}"
                                          class="w-16 h-16 object-contain rounded border bg-white"
                                          alt=""
                                          loading="lazy"
@@ -96,19 +95,16 @@
                             </div>
                         </div>
 
-                        {{-- Цена --}}
                         <div class="col-span-6 md:col-span-2 text-right text-slate-900 font-semibold">
                             {{ $fmt($price) }} ₽
                         </div>
 
-                        {{-- Количество --}}
                         <div class="col-span-3 md:col-span-2 text-center">
                             <span class="inline-flex items-center justify-center w-12 h-9 bg-amber-50 rounded border border-amber-100 text-slate-800">
                                 {{ $qty }}
                             </span>
                         </div>
 
-                        {{-- Сумма и кнопка удалить --}}
                         <div class="col-span-3 md:col-span-2 text-right">
                             <div class="text-slate-900 font-bold">{{ $fmt($sum) }} ₽</div>
 
@@ -123,7 +119,6 @@
                 @endforeach
             </div>
 
-            {{-- Итог --}}
             <div class="px-4 md:px-6 py-4 bg-amber-50/60 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div class="text-slate-700">
                     Всего товаров: {{ collect($cart)->sum('quantity') }}
@@ -135,7 +130,6 @@
             </div>
         </div>
 
-        {{-- Кнопки --}}
         <div class="mt-6 flex flex-col sm:flex-row gap-3">
             <a href="{{ route('catalog') }}"
                class="btn-ghost text-center">

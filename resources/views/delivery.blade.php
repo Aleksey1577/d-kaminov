@@ -7,10 +7,10 @@
 @section('content')
 <div class="section p-6 sm:p-8 md:p-10 space-y-10">
     <div class="text-center space-y-3">
-        <div class="eyebrow inline-flex">Информация</div>
-        <h1 class="section-title text-3xl sm:text-4xl">Доставка и оплата</h1>
+        <div class="eyebrow inline-flex">Дом каминов</div>
+        <h1 class="section-title text-3xl sm:text-4xl">Доставка Дом каминов в Самаре</h1>
         <p class="section-lead text-base mx-auto">
-            Привозим оборудование по Самаре и области, помогаем с разгрузкой и установкой.
+            Дом каминов привозит оборудование по Самаре и области, помогаем с разгрузкой и установкой.
             Оплата удобным способом — наличными, картой онлайн или по реквизитам.
         </p>
     </div>
@@ -65,14 +65,14 @@
 @push('structured-data')
 <script type="application/ld+json">
     {
-        "@context": "https://schema.org ",
+        "@context": "https://schema.org",
         "@type": "Service",
-        "serviceType": "Доставка товаров",
+        "serviceType": "Доставка товаров Дом каминов",
         "provider": {
             "@type": "Organization",
-            "name": "D-Kaminov"
+            "name": "Дом каминов"
         },
-        "description": "{{ $seoData['description'] }}",
+        "description": @json($seoData['description']),
         "areaServed": {
             "@type": "City",
             "name": "Самара"

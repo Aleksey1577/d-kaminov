@@ -7,16 +7,15 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Session; 
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 trait CommonDataTrait
 {
-    /**
-     * @return SupportCollection<int, array{name: string, image_url: string|null}>
-     */
+
     protected function getCategories(): SupportCollection
     {
-        $data = Cache::remember('categories:list:v1', now()->addHours(6), function (): array {
+        $data = Cache::remember('categories:list:v2', now()->addHours(6), function (): array {
             return Product::query()
                 ->whereNotNull('kategoriya')
                 ->where('kategoriya', '!=', '')
@@ -26,6 +25,7 @@ trait CommonDataTrait
                 ->get()
                 ->map(fn($row) => [
                     'name' => (string) $row->name,
+                    'slug' => Str::slug((string) $row->name),
                     'image_url' => $row->image_url ? (string) $row->image_url : null,
                 ])
                 ->values()
@@ -41,30 +41,18 @@ trait CommonDataTrait
         return collect($cart)->sum('quantity') ?? 0;
     }
 
-    /**
-     * @return int
-     */
     protected function getUserCompareCount(): int
     {
         $compare = Session::get('compare', []);
-        return count($compare);  
+        return count($compare);
     }
-    
-    /**
-     * @return int
-     */
+
     protected function getUserFavoritesCount(): int
     {
         $favorites = Session::get('favorites', []);
-        return count($favorites);  
+        return count($favorites);
     }
 
-    /**
-     * Устанавливает отображаемую цену для продуктов (минимальную из вариантов для 'product').
-     *
-     * @param Collection|LengthAwarePaginator $products
-     * @return void
-     */
     protected function setDisplayPrices(Collection|LengthAwarePaginator $products): void
     {
         $collection = $products instanceof LengthAwarePaginator ? $products->getCollection() : $products;

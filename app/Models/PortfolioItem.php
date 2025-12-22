@@ -22,4 +22,3 @@ class PortfolioItem extends Model
         'position' => 'integer',
     ];
 }
-

@@ -1,7 +1,5 @@
 <?php
 
-// app/Models/Product.php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -74,7 +72,6 @@ class Product extends Model
         return $res;
     }
 
-    /** Первый непустой URL из image_url / image_url_1..20 (без проверки существования) */
     public function getFirstImageUrlAttribute(): ?string
     {
         $fields = array_merge(['image_url'], array_map(fn ($i) => "image_url_{$i}", range(1, 20)));
@@ -87,36 +84,28 @@ class Product extends Model
         return null;
     }
 
-    /** Нормализуем путь `/storage/xyz.jpg` → проверяем на диске `public` */
     protected function resolveExistingUrl(?string $url): ?string
     {
         if (!$url) return null;
 
-        // абсолютные URL (http/https/data) — не трогаем
         if (preg_match('~^(https?:)?//|^data:~i', $url)) {
             return $url;
         }
 
-        // относительный путь из storage: "/storage/foo/bar.jpg"
         if (Str::startsWith($url, '/storage/')) {
-            $relative = Str::after($url, '/storage/'); // foo/bar.jpg
+            $relative = Str::after($url, '/storage/');
             if (Storage::disk('public')->exists($relative)) {
-                return $url; // файл есть
+                return $url;
             }
-            return null; // файла нет — не даём 404
+            return null;
         }
 
-        // любой другой относительный путь — оставляем как есть
         return $url;
     }
 
-    /**
-     * Гарантированный превью-URL: существующая первая картинка или плейсхолдер.
-     * Ни одного 404 → нет долгих onerror и «подпрыгиваний».
-     */
     public function getThumbUrlAttribute(): string
     {
         $candidate = $this->resolveExistingUrl($this->first_image_url);
-        return $candidate ?: asset('images/no-image.png');
+        return $candidate ?: asset('assets/placeholder.png');
     }
 }

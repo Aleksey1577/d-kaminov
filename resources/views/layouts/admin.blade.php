@@ -24,7 +24,6 @@
     ];
 @endphp
 
-<!-- Боковое меню -->
 <aside class="bg-gray-900 text-white w-72 flex-shrink-0 hidden md:flex flex-col">
     <div class="px-6 py-6 border-b border-gray-800">
         <div class="text-lg font-bold tracking-tight">Админ-панель</div>
@@ -55,7 +54,6 @@
     </form>
 </aside>
 
-<!-- Мобильное меню -->
 <div x-show="open" x-cloak class="fixed inset-0 z-40 md:hidden">
     <div class="absolute inset-0 bg-black/50" @click="open = false"></div>
     <div class="relative bg-gray-900 text-white w-72 h-full shadow-lg">
@@ -81,7 +79,6 @@
     </div>
 </div>
 
-<!-- Основной контент -->
 <div class="flex-1 flex flex-col min-h-screen">
     <header class="bg-white border-b border-gray-200 px-4 md:px-8 py-3 flex items-center justify-between sticky top-0 z-20">
         <div class="flex items-center gap-3">

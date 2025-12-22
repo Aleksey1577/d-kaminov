@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
 @section('title', 'Оформление заказа')
-@section('seo_title', 'Оформление заказа | D-Kaminov')
-@section('seo_description', 'Введите контакты, адрес и способ оплаты для покупки каминов и печей в интернет-магазине D-Kaminov.')
+@section('seo_title', 'Оформление заказа | Дом каминов')
+@section('seo_description', 'Введите контакты, адрес и способ оплаты для покупки каминов и печей в интернет-магазине Дом каминов.')
+@section('seo_robots', 'noindex,follow')
 
 @section('content')
     <h1 class="text-2xl font-bold mb-6">Оформление заказа</h1>
@@ -24,9 +25,8 @@
         </div>
     @endif
 
-    <!-- Форма оформления заказа -->
     <form action="{{ route('order.store') }}" method="POST"
-          x-data="{ 
+          x-data="{
               pickupType: @js(old('pickup_type', 'pickup')),
               paymentMethod: @js(old('payment_method', 'cash')),
               setPickupType(type) { this.pickupType = type },
@@ -35,13 +35,12 @@
           class="grid grid-cols-1 md:grid-cols-3 gap-8">
         @csrf
 
-        <!-- Левая часть — форма -->
         <div class="md:col-span-2 space-y-6">
             <div class="bg-white shadow-md rounded-lg p-6">
                 <h2 class="text-xl font-semibold mb-4">Контактные данные</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Имя -->
+
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700">Имя</label>
                         <input type="text" name="name" id="name" required
@@ -51,7 +50,6 @@
                         @error('name') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Телефон -->
                     <div>
                         <label for="phone" class="block text-sm font-medium text-gray-700">Телефон</label>
                         <input type="tel" name="phone" id="phone" required
@@ -62,7 +60,6 @@
                         @error('phone') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Email -->
                     <div class="md:col-span-2">
                         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                         <input type="email" name="email" id="email" required
@@ -72,7 +69,6 @@
                         @error('email') <div class="text-xs text-red-600 mt-1">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Способ получения -->
                     <div class="md:col-span-2">
                         <h3 class="text-sm font-medium text-gray-700 mb-2">Способ получения</h3>
                         <div class="flex flex-wrap gap-4 mb-4">
@@ -97,14 +93,12 @@
                             </button>
                         </div>
 
-                        <!-- Блок самовывоза -->
                         <div x-show="pickupType === 'pickup'" class="bg-gray-50 p-4 rounded-md mb-4">
                             <p class="font-medium">Наш магазин:</p>
                             <p class="text-gray-600">ТЦ Интермебель, Московское шоссе 16 км, 1в ст2, 2 этаж</p>
                             <p class="text-gray-600">Тел: +7 (917) 953-58-50</p>
                         </div>
 
-                        <!-- Поле адреса доставки -->
                         <div x-show="pickupType === 'delivery'">
                             <label for="address" class="block text-sm font-medium text-gray-700">Адрес доставки</label>
                             <textarea name="address" id="address" rows="3"
@@ -114,7 +108,6 @@
                         </div>
                     </div>
 
-                    <!-- Способ оплаты -->
                     <div class="md:col-span-2">
                         <h3 class="text-sm font-medium text-gray-700 mb-2">Способ оплаты</h3>
                         <div class="flex flex-wrap gap-4 mb-4">
@@ -139,7 +132,6 @@
                             </button>
                         </div>
 
-                        <!-- Скрытые поля для отправки -->
                         <input type="hidden" name="pickup_type" value="{{ old('pickup_type', 'pickup') }}" x-model="pickupType">
                         <input type="hidden" name="payment_method" value="{{ old('payment_method', 'cash') }}" x-model="paymentMethod">
                     </div>
@@ -147,7 +139,6 @@
             </div>
         </div>
 
-        <!-- Правая часть — корзина -->
         <div class="bg-white shadow-md rounded-lg p-6">
             <h2 class="text-xl font-semibold mb-4">Ваш заказ</h2>
             <div class="space-y-4">

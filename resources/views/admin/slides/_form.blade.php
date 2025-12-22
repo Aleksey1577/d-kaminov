@@ -29,7 +29,7 @@
                     <option value="{{ $cat }}" @selected(old('category', $slide->category ?? '') === $cat)>{{ $cat }}</option>
                 @endforeach
             </select>
-            <p class="text-xs text-gray-500 mt-1">Кнопка будет вести в каталог с параметром ?category=...</p>
+            <p class="text-xs text-gray-500 mt-1">Кнопка будет вести в каталог выбранной категории.</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Цвет текста</label>

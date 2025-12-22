@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SitemapController extends Controller
@@ -58,7 +59,7 @@ class SitemapController extends Controller
                 if ($name === '' || isset($knownCategoryNames[$name])) {
                     continue;
                 }
-                $writeUrl(route('catalog', ['category' => $name]));
+                $writeUrl(route('catalog', ['category' => Str::slug($name)]));
             }
 
             foreach (Product::query()->select(['product_id', 'naimenovanie', 'updated_at'])->latest('updated_at')->cursor() as $product) {

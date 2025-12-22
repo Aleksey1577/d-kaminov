@@ -6,8 +6,7 @@
         <span class="text-xs text-gray-600 group-hover:text-orange transition-colors duration-300">Поиск</span>
     </button>
 
-    <!-- Поле поиска -->
-    <form 
+    <form
         x-show="searchOpen"
         @click.away="searchOpen = false"
         x-transition

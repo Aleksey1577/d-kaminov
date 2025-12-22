@@ -50,14 +50,13 @@ $partners = [
 ['logo' => asset('assets/partners/vezuvii.svg'), 'alt' => 'Vezuvii'],
 ['logo' => asset('assets/partners/Logo_warmhaus.png'), 'alt' => 'Warmhaus'],
 ['logo' => asset('assets/partners/interflame_logo.png'), 'alt' => 'interflame'],
-['logo' => asset('assets/partners/ecokamin-logo.png'), 'alt' => 'ecokamin'], 
+['logo' => asset('assets/partners/ecokamin-logo.png'), 'alt' => 'ecokamin'],
 ['logo' => asset('assets/partners/schmid-logo.png'), 'alt' => 'schmid'],
 ['logo' => asset('assets/partners/spartherm.png'), 'alt' => 'spartherm'],
 
 ];
 @endphp
 
-{{-- ширина как у других секций: без max-w-7xl, просто общий отступ по краям --}}
 <div class="section p-6 sm:p-8 md:p-10 mb-12 overflow-hidden">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <div>
@@ -71,7 +70,7 @@ $partners = [
         <div class="absolute inset-0 flex items-center overflow-hidden">
             <div class="partners-marquee">
                 @foreach (array_merge($partners, $partners) as $partner)
-                {{-- делаю шире элементы, чтобы занимали больше пространства --}}
+
                 <div class="flex-shrink-0 w-44 sm:w-52 md:w-60 lg:w-72 px-6">
                     <div class="h-28 flex items-center justify-center">
                         <img src="{{ $partner['logo'] }}"

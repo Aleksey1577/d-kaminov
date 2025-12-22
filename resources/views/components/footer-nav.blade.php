@@ -1,4 +1,3 @@
-<!-- resources/views/components/footer-nav.blade.php -->
 <ul class="grid grid-cols-1 gap-4">
     <li class="col-span-2 font-semibold text-orange">Каталог</li>
     <li><a href="{{ route('catalog') }}" class="hover:text-orange">Каталог</a></li>

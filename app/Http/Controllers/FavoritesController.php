@@ -36,7 +36,7 @@ class FavoritesController extends Controller
         if (request()->ajax()) {
             return response()->json([
                 'status' => 'added',
-                'count' => count($favorites)  // <-- Добавьте это
+                'count' => count($favorites)
             ])->withCookie($cookie);
         }
         return redirect()->back()->with('success', 'Товар добавлен в избранное')->withCookie($cookie);
@@ -60,7 +60,7 @@ class FavoritesController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'status' => 'removed',
-                'count' => count($favorites)  // <-- Добавьте это
+                'count' => count($favorites)
             ])->withCookie($cookie);
         }
         return redirect()->back()->with('success', 'Товар удалён из избранного')->withCookie($cookie);

@@ -1,5 +1,5 @@
 @php
-    $image = (string) ($product->thumb_url ?? asset('images/no-image.png'));
+    $image = (string) ($product->thumb_url ?? asset('assets/placeholder.png'));
     $imageAbs = \Illuminate\Support\Str::startsWith($image, ['http://', 'https://', '//']) ? $image : url($image);
 
     $rawStock = (string) ($product->v_nalichii_na_sklade ?? '');

@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
 @section('title', 'Заказ оформлен')
-@section('seo_title', 'Спасибо за заказ | D-Kaminov')
+@section('seo_title', 'Спасибо за заказ | Дом каминов')
 @section('seo_description', 'Заказ успешно оформлен. Мы свяжемся с вами для подтверждения и доставки камина или печи.')
+@section('seo_robots', 'noindex,follow')
 
 @section('content')
     <div class="text-center py-12">

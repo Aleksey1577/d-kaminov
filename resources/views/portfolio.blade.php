@@ -7,9 +7,9 @@
 @section('content')
 <div class="p-6 max-w-7xl mx-auto">
     <header class="mb-12 text-center">
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">Наши работы</h1>
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Портфолио Дом каминов</h1>
         <p class="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
-            Мы гордимся каждым проектом — от уютных дачных печей до премиальных каминов в элитных коттеджах.
+            Дом каминов гордится каждым проектом — от уютных дачных печей до премиальных каминов в элитных коттеджах.
             <span class="text-orange font-semibold">Более 550 установок</span> по Самаре, Тольятти и области.
             Все работы выполнены <span class="font-medium">под ключ</span>: от проектирования до запуска с гарантией 3 года.
         </p>
@@ -38,7 +38,6 @@
         @endforelse
     </section>
 
-
 </div>
 @endsection
 
@@ -47,7 +46,6 @@
     $itemListElement = $portfolioItems->values()->map(function ($item, $index) {
         $payload = [
             '@type' => 'CreativeWork',
-            'position' => $index + 1,
             'name' => $item->title,
             'description' => $item->subtitle,
             'url' => url()->current() . '#work-' . ($index + 1),
@@ -59,14 +57,20 @@
                 : asset(ltrim($item->image_url, '/'));
         }
 
-        return $payload;
+        $payload = array_filter($payload, fn($v) => !is_null($v) && $v !== '');
+
+        return [
+            '@type' => 'ListItem',
+            'position' => $index + 1,
+            'item' => $payload,
+        ];
     })->all();
 
     $jsonLd = [
         '@context' => 'https://schema.org',
         '@type' => 'ItemList',
-        'name' => 'Портфолио ECHA + TECH — Установка каминов и печей',
-        'description' => 'Реальные фото наших работ по монтажу каминов, печей и дымоходов в Самаре и области. Гарантия 3 года, выезд в день заказа.',
+        'name' => 'Портфолио Дом каминов — установка каминов и печей',
+        'description' => 'Дом каминов: реальные фото наших работ по монтажу каминов, печей и дымоходов в Самаре и области. Гарантия 3 года, выезд в день заказа.',
         'numberOfItems' => $portfolioItems->count(),
         'itemListElement' => $itemListElement,
     ];

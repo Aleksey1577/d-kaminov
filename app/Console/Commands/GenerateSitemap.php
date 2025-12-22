@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Product;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 
@@ -17,12 +18,11 @@ class GenerateSitemap extends Command
         $sitemap = Sitemap::create()
             ->add(Url::create('/'))
             ->add(Url::create('/catalog'))
-            ->add(Url::create('/contacts'))
-            ->add(Url::create('/portfolio'))
-            ->add(Url::create('/montage'))
-            ->add(Url::create('/delivery'));
+            ->add(Url::create('/kontakty'))
+            ->add(Url::create('/raboty'))
+            ->add(Url::create('/montazh'))
+            ->add(Url::create('/dostavka'));
 
-        // Динамические страницы товаров
         Product::query()
             ->whereIn('tip_stroki', ['product', 'product_variant', 'variant'])
             ->orderBy('product_id')
@@ -35,7 +35,6 @@ class GenerateSitemap extends Command
                 }
             });
 
-        // Категории каталога через параметр category
         $categories = Product::query()
             ->whereIn('tip_stroki', ['product', 'product_variant', 'variant'])
             ->whereNotNull('kategoriya')
@@ -46,9 +45,7 @@ class GenerateSitemap extends Command
 
         foreach ($categories as $category) {
             $sitemap->add(
-                Url::create(
-                    route('catalog') . '?' . http_build_query(['category' => $category])
-                )
+                Url::create(route('catalog', ['category' => Str::slug($category)]))
             );
         }
 

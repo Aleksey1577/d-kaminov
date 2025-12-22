@@ -3,7 +3,7 @@
 @section('title', 'Главная админки')
 
 @section('content')
-    {{-- ссылка на сайт --}}
+
     <div class="mb-4">
         <span class="text-sm text-gray-500 mr-1">Сайт:</span>
         <a href="{{ url('/') }}" target="_blank"

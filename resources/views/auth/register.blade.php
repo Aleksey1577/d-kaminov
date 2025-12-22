@@ -1,9 +1,9 @@
-{{-- resources/views/auth/register.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Регистрация')
-@section('seo_title', 'Регистрация | D-Kaminov')
+@section('seo_title', 'Регистрация | Дом каминов')
 @section('seo_description', 'Создайте аккаунт, чтобы сохранять избранное, сравнивать товары и оформлять заказы быстрее.')
+@section('seo_robots', 'noindex,follow')
 
 @section('content')
     <div class="min-h-[70vh] flex items-center justify-center">

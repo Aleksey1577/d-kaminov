@@ -1,10 +1,23 @@
 @extends('layouts.app')
 
-@section('title', $category ? 'Купить ' . $category : 'Каталог товаров')
-@section('seo_title', $category ? 'Купить ' . $category . ' в D-Kaminov' : 'Каталог каминов и печей D-Kaminov')
+@section('title', $category ? 'Купить ' . $category . ' в Дом каминов' : 'Каталог Дом каминов')
+@section('seo_title', $category ? 'Купить ' . $category . ' в Дом каминов' : 'Каталог Дом каминов — камины и печи')
 @section('seo_description', $category
-    ? 'Купить ' . $category . ' в Самаре и с доставкой по России. Цены, наличие, фильтры и характеристики в каталоге D-Kaminov.'
-    : 'Каталог каминов, топок, печей и аксессуаров в D-Kaminov. Фильтры по цене, бренду и наличию, доставка и монтаж под ключ.'
+    ? 'Купить ' . $category . ' в Дом каминов в Самаре и с доставкой по России. Цены, наличие, фильтры и характеристики.'
+    : 'Каталог Дом каминов: камины, топки, печи и аксессуары. Фильтры по цене, бренду и наличию, доставка и монтаж под ключ.'
+)
+@section('seo_keywords', $category
+    ? implode(', ', array_filter([
+        $category . ' купить',
+        $category . ' Самара',
+        'каталог ' . $category,
+        $category . ' цены',
+        'камины Самара',
+        'дом каминов',
+        'дом каминов Самара',
+        'Дом каминов',
+    ]))
+    : 'дом каминов каталог, каталог каминов, каталог печей, дом каминов Самара, камины Самара, печи Самара, биокамины, электрокамины, топки, дымоходы, купить камин, купить печь'
 )
 
 @section('content')
@@ -12,7 +25,7 @@
     <div class="space-y-2">
         <div class="eyebrow">{{ $category ? 'Категория' : 'Каталог' }}</div>
         <h1 class="section-title">
-            {{ $category ? 'Купить ' . $category : 'Каталог товаров' }}
+            {{ $category ? 'Купить ' . $category . ' в Дом каминов' : 'Каталог Дом каминов' }}
         </h1>
         <p class="section-lead text-base">
             Актуальные цены, наличие и удобные фильтры по бренду, стоимости и характеристикам.
@@ -20,8 +33,8 @@
     </div>
 
     @if(!($showCategories ?? false))
-        <form method="GET" action="{{ route('catalog') }}" class="flex items-center gap-2 sm:pb-1">
-            @foreach(request()->except(['sort','page']) as $k => $v)
+        <form method="GET" action="{{ route('catalog', $categorySlug ? ['category' => $categorySlug] : []) }}" class="flex items-center gap-2 sm:pb-1">
+            @foreach(request()->except(['sort','page','category']) as $k => $v)
                 @if(is_array($v))
                     @foreach($v as $vv)
                         <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
@@ -45,7 +58,6 @@
     @endif
 </div>
 
-{{-- Режим 1: Плитка категорий --}}
 @if($showCategories ?? false)
 
     @php
@@ -64,7 +76,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @foreach ($sorted as $cat)
-            <a href="{{ url('/catalog') . '?category=' . urlencode($cat['name']) }}"
+            <a href="{{ route('catalog', ['category' => $cat['slug']]) }}"
                class="surface overflow-hidden hover:-translate-y-1 transition-transform duration-200 flex flex-col">
                 <img src="{{ asset($cat['image_url']) }}"
                      alt="{{ $cat['name'] }}"
@@ -81,18 +93,16 @@
 
 @else
 
-    {{-- Режим 2: Категория выбрана — фильтры + товары --}}
     <div class="flex flex-col md:flex-row gap-6">
 
-        <!-- Фильтры -->
         @include('components.filters', [
             'proizvoditeli' => $proizvoditeli,
             'v_nalichii_options' => $v_nalichii_options,
             'currentFilters' => request()->all(),
             'categoryName' => $category,
+            'categorySlug' => $categorySlug,
         ])
 
-        <!-- Сетка товаров -->
         <div class="flex-1">
             <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 @foreach($products as $product)
@@ -100,7 +110,6 @@
                 @endforeach
             </div>
 
-            <!-- Пагинация -->
             <div class="mt-8">
                 {{ $products->appends(request()->query())->links() }}
             </div>

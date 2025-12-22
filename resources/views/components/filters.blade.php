@@ -1,9 +1,17 @@
 @php
     $categoryName = $categoryName ?? '';
+    $categorySlug = $categorySlug ?? request()->route('category');
+    $resetParams = [];
+    if ($categorySlug) {
+        $resetParams['category'] = $categorySlug;
+    }
+    if (request()->filled('sort')) {
+        $resetParams['sort'] = request()->sort;
+    }
 @endphp
 
 <div x-data="{ open: false }" class="md:w-1/5">
-    <!-- Кнопка для мобильных -->
+
     <button @click="open = !open"
         class="md:hidden w-full btn-primary justify-between mb-4">
         <span>Фильтры</span>
@@ -15,19 +23,13 @@
     </button>
 
     <div x-show="open || window.innerWidth >= 768" x-cloak class="surface p-6 md:block">
-        <form method="GET" action="{{ route('catalog') }}">
+        <form method="GET" action="{{ route('catalog', $categorySlug ? ['category' => $categorySlug] : []) }}">
             <div class="space-y-5">
-	                {{-- Скрытый category --}}
-	                @if(request()->category)
-	                <input type="hidden" name="category" value="{{ request()->category }}">
-	                @endif
-	
-	                {{-- Скрытый sort (чтобы сохранялся при сабмите фильтров) --}}
+
 	                @if(request()->filled('sort'))
 	                    <input type="hidden" name="sort" value="{{ request()->sort }}">
 	                @endif
 
-	                {{-- Цена: диапазон от/до --}}
 	                <div>
 	                    <label class="block text-sm font-semibold text-slate-800 mb-2">Цена, ₽</label>
 	                    <div class="flex space-x-2">
@@ -40,7 +42,6 @@
                     </div>
                 </div>
 
-                {{-- Производитель (общий) --}}
                 <div>
                     <label for="proizvoditel" class="block text-sm font-semibold text-slate-800 mb-2">Производитель</label>
                     <select name="proizvoditel" id="proizvoditel"
@@ -52,10 +53,8 @@
                     </select>
                 </div>
 
-                {{-- Категорийные фильтры --}}
                 @php $opts = $filterOptions @endphp
 
-                {{-- Биокамин --}}
                 @if($categoryName === 'Биокамины')
                 <div>
                     <label for="tip_tovara" class="block text-sm font-semibold text-slate-800 mb-2">Тип товара</label>
@@ -79,7 +78,6 @@
                 </div>
                 @endif
 
-                {{-- Каминное/печное литье --}}
                 @if($categoryName === 'Каминное/печное литье')
                 <div>
                     <label for="tip_tovara" class="block text-sm font-semibold text-slate-800 mb-2">Тип товара</label>
@@ -104,7 +102,6 @@
 
                 @endif
 
-                {{-- Газовые топки, уличные нагреватели --}}
                 @if($categoryName === 'Газовые топки, уличные нагреватели')
 
                 <div>
@@ -129,7 +126,6 @@
                 </div>
                 @endif
 
-                {{-- Вентиляция --}}
                 @if($categoryName === 'Вентиляция')
 
                 <div>
@@ -144,10 +140,8 @@
                 </div>
                 @endif
 
-                {{-- Каминокомплекты --}}
                 @if($categoryName === 'Каминокомплекты')
 
-                <!-- Размеры -->
                 <div class="space-y-2">
                     <label class="block text-sm font-semibold text-slate-800">Высота (мм)</label>
                     <div class="flex gap-2">
@@ -174,7 +168,6 @@
 
                 @endif
 
-                {{-- Электроочаги --}}
                 @if($categoryName === 'Электроочаги')
 
                 <div>
@@ -200,7 +193,6 @@
                 </div>
                 @endif
 
-                {{-- Печи, камины, каминокомплекты --}}
                 @if($categoryName === 'Печи, камины, каминокомплекты')
 
                 <div>
@@ -256,7 +248,6 @@
                 </div>
                 @endif
 
-                {{-- Остальные категории (Каминокомплекты, Электроочаги и т.п.) --}}
                 @if(in_array($categoryName, [
                     'Каминокомплекты',
                     'Электроочаги',
@@ -266,15 +257,19 @@
                     'Печи, камины, каминокомплекты',
                     'Дымоходы',
                 ], true))
-                {{-- Для всех этих достаточно общих price+proizvoditel --}}
-                {{-- (Мы уже показали их выше) --}}
+
                 @endif
 
-                {{-- Кнопка Применить --}}
-                <button type="submit"
-                    class="w-full btn-primary justify-center">
-                    Применить
-                </button>
+                <div class="space-y-2">
+                    <button type="submit"
+                        class="w-full btn-primary justify-center">
+                        Применить
+                    </button>
+                    <a href="{{ route('catalog', $resetParams) }}"
+                        class="w-full btn-ghost justify-center text-center">
+                        Сбросить
+                    </a>
+                </div>
             </div>
         </form>
     </div>

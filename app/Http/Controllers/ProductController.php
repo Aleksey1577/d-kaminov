@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Services\SeoService;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    // Страница товара (фронт)
+
     public function show($slug)
     {
         $parts = explode('-', $slug);
@@ -57,6 +58,9 @@ class ProductController extends Controller
             ];
         }
 
+        $categoryName = $product->kategoriya ?? 'Товар';
+        $categorySlug = $product->kategoriya ? Str::slug($product->kategoriya) : null;
+
         $seo->forProduct([
             'naimenovanie' => $product->naimenovanie,
             'seo_title' => $meta['seo_title'] ?? null,
@@ -74,7 +78,7 @@ class ProductController extends Controller
             ->canonical($productUrl)
             ->breadcrumb('Главная', route('home'))
             ->breadcrumb('Каталог', route('catalog'))
-            ->breadcrumb($product->kategoriya ?? 'Товар', route('catalog', ['category' => $product->kategoriya]))
+            ->breadcrumb($categoryName, $categorySlug ? route('catalog', ['category' => $categorySlug]) : route('catalog'))
             ->breadcrumb($product->naimenovanie);
 
         return view('product', compact('product', 'variants', 'seo', 'meta'));

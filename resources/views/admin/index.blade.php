@@ -3,7 +3,7 @@
 @section('title', 'Главная админки')
 
 @section('content')
-    {{-- ссылка на сайт --}}
+
     <div class="mb-2">
         <span class="text-sm text-gray-500 mr-1">Сайт:</span>
         <a href="{{ url('/') }}" target="_blank"
@@ -15,32 +15,28 @@
     <h1 class="text-2xl font-bold mb-6">Добро пожаловать, {{ auth()->user()->name }}</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <!-- Заказы -->
+
         <div class="bg-white shadow-md rounded-lg p-6">
             <h2 class="text-lg font-semibold">Заказы</h2>
             <p class="text-3xl font-bold text-orange mt-2">{{ $totalOrders }}</p>
         </div>
 
-        <!-- Товары -->
         <div class="bg-white shadow-md rounded-lg p-6">
             <h2 class="text-lg font-semibold">Товары</h2>
             <p class="text-3xl font-bold text-orange mt-2">{{ $totalProducts }}</p>
         </div>
 
-        <!-- Активные пользователи -->
         <div class="bg-white shadow-md rounded-lg p-6">
             <h2 class="text-lg font-semibold">Активные пользователи (за сутки)</h2>
             <p class="text-3xl font-bold text-orange mt-2">{{ $activeUsers }}</p>
         </div>
 
-        <!-- Новые пользователи -->
         <div class="bg-white shadow-md rounded-lg p-6">
             <h2 class="text-lg font-semibold">Новые пользователи (7 дней)</h2>
             <p class="text-3xl font-bold text-orange mt-2">{{ $newUsers }}</p>
         </div>
     </div>
 
-    <!-- Последние заказы -->
     <div class="bg-white shadow-md rounded-lg p-6 mt-6">
         <h2 class="text-xl font-bold mb-4">Последние заказы</h2>
 

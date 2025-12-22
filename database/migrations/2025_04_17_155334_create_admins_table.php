@@ -6,12 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
     public function up(): void
     {
-    // database/migrations/..._create_admins_table.php
+
 Schema::create('admins', function (Blueprint $table) {
     $table->id();
     $table->string('name');
@@ -22,9 +20,6 @@ Schema::create('admins', function (Blueprint $table) {
 });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('admins');

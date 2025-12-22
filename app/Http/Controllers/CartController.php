@@ -47,14 +47,12 @@ class CartController extends Controller
 
     public function add(Request $request, $productId)
     {
-        // Родительский товар (страница которого открыта)
+
         $parent = Product::where('product_id', $productId)->firstOrFail();
 
-        // Если передали variant_id — используем его как позицию
         $variantId = $request->input('variant_id');
         $qty       = max(1, (int) $request->input('quantity', 1));
 
-        // Товар-источник цены (вариант или сам родитель)
         $item = $variantId
             ? Product::where('product_id', $variantId)->where('tip_stroki', 'variant')->first()
             : null;
@@ -63,14 +61,12 @@ class CartController extends Controller
             $item = $parent;
         }
 
-        // Цена: display_price (если вы его рассчитываете), иначе price
         $price = (float) ($item->display_price ?? $item->price ?? 0);
 
-        // Фолбэк: если цена 0/NULL, попробуем строку "product_variant" с тем же наименованием
         if ($price <= 0) {
             $fallback = Product::where('tip_stroki', 'product_variant')
                 ->where('naimenovanie', $parent->naimenovanie)
-                ->orderBy('price') // логика выбора может быть другой
+                ->orderBy('price')
                 ->first();
 
             if ($fallback) {
@@ -82,7 +78,6 @@ class CartController extends Controller
             return back()->with('error', 'Не удалось определить цену выбранного варианта.');
         }
 
-        // Собираем красивое имя: "Наименование товара (Наименование артикула)"
         $displayName = $parent->naimenovanie;
         if ($item->tip_stroki === 'variant') {
             if (!empty($item->naimenovanie_artikula)) {
@@ -92,20 +87,19 @@ class CartController extends Controller
             }
         }
 
-        // Ключ позиции: ID варианта, если есть, иначе ID родителя
         $lineKey = $variantId ?: $parent->product_id;
 
         $cart = session()->get('cart', []);
 
         if (isset($cart[$lineKey])) {
             $cart[$lineKey]['quantity'] += $qty;
-            // Обновим цену на случай, если пересчитали курсы/цены
+
             $cart[$lineKey]['price'] = $price;
         } else {
             $cart[$lineKey] = [
-                'product_id'   => $item->product_id,           
+                'product_id'   => $item->product_id,
                 'parent_id'    => $parent->product_id,
-                'slug'         => $parent->slug,             
+                'slug'         => $parent->slug,
                 'naimenovanie' => $displayName,
                 'price'        => $price,
                 'image_url'    => $item->image_url ?: $parent->image_url,
@@ -117,7 +111,6 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
-        // Если используете AJAX — можно вернуть JSON; иначе редирект как раньше
         if ($request->ajax()) {
             $count = collect($cart)->sum('quantity');
             return response()->json(['status' => 'ok', 'count' => $count]);

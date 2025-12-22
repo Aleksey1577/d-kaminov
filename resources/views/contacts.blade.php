@@ -1,4 +1,3 @@
-{{-- resources/views/contact.blade.php --}}
 @extends('layouts.app')
 
 @section('seo_title', $seoData['title'])
@@ -8,10 +7,10 @@
 @section('content')
 <div class="section p-6 sm:p-8 md:p-10 space-y-8">
     <div class="space-y-3">
-        <div class="eyebrow inline-flex">Контакты</div>
-        <h1 class="section-title text-3xl sm:text-4xl">Свяжитесь с нами</h1>
+        <div class="eyebrow inline-flex">Дом каминов</div>
+        <h1 class="section-title text-3xl sm:text-4xl">Контакты Дом каминов в Самаре</h1>
         <p class="section-lead text-base">
-            Ответим на вопросы по подбору, монтажу и доставке. Работаем без выходных с 10:00 до 19:30.
+            Адрес и телефон Дом каминов в Самаре. Ответим на вопросы по подбору, монтажу и доставке. Работаем без выходных с 10:00 до 19:30.
         </p>
     </div>
 
@@ -153,18 +152,26 @@
 <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "D-Kaminov",
+        "@type": "Store",
+        "name": "Дом каминов",
+        "url": @json(route('contacts')),
         "telephone": "+79179535850",
         "email": "info@d-kaminov.com",
+        "image": @json(asset('assets/header/logo.svg')),
         "address": {
             "@type": "PostalAddress",
             "streetAddress": "ТЦ Интермебель, Московское шоссе 16 км, 1в ст2, 2 этаж",
             "addressLocality": "Самара",
+            "addressRegion": "Самарская область",
             "postalCode": "443095",
             "addressCountry": "RU"
         },
-        "openingHours": "Mo-Su 10:00-19:30"
+        "openingHours": "Mo-Su 10:00-19:30",
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 53.249404,
+            "longitude": 50.212019
+        }
     }
 </script>
 @endpush

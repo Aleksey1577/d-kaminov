@@ -16,10 +16,61 @@
         </a>
     </div>
 
-	    <!-- Фильтры -->
+    @if(session('import_report'))
+        @php $report = session('import_report'); @endphp
+        <div class="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 rounded-lg">
+            <div class="text-sm font-medium">
+                Импорт: создано {{ $report['created'] ?? 0 }}, обновлено {{ $report['updated'] ?? 0 }}, пропущено {{ $report['skipped'] ?? 0 }}.
+            </div>
+            @if(!empty($report['errors']))
+                <div class="text-xs text-amber-800 mt-2 space-y-1">
+                    @foreach($report['errors'] as $line)
+                        <div>{{ $line }}</div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="bg-red-100 text-red-800 px-4 py-3 rounded-lg border border-red-200">
+            {{ $errors->first() }}
+        </div>
+    @endif
+
+    <div class="flex flex-col lg:flex-row lg:items-end gap-4">
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('admin.products.export', 'csv') }}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition">
+                Скачать CSV
+            </a>
+            <a href="{{ route('admin.products.export', 'xlsx') }}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition">
+                Скачать Excel
+            </a>
+        </div>
+        <form action="{{ route('admin.products.import') }}"
+              method="POST"
+              enctype="multipart/form-data"
+              class="flex flex-col sm:flex-row sm:items-center gap-2">
+            @csrf
+            <input type="file"
+                   name="file"
+                   accept=".csv,.xlsx"
+                   class="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white">
+            <button type="submit"
+                    class="inline-flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">
+                Загрузить файл
+            </button>
+        </form>
+    </div>
+    <p class="text-xs text-gray-500">
+        Поддерживаются .csv и .xlsx, первая строка — названия колонок (как в базе). Если указан `product_id`, строка обновит товар, иначе создаст новый.
+    </p>
+
 	    <form method="GET" action="{{ route('admin.products') }}" class="space-y-4">
 	        <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
-	            {{-- Поиск --}}
+
 	            <div class="md:col-span-2">
 	                <label class="block text-sm text-gray-600 mb-1">Поиск</label>
 	                <input type="text"
@@ -29,7 +80,6 @@
 	                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
 	            </div>
 
-	            {{-- Категория --}}
 	            <div>
 	                <label class="block text-sm text-gray-600 mb-1">Категория</label>
 	                <select name="kategoriya" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200"
@@ -43,7 +93,6 @@
 	                </select>
 	            </div>
 
-	            {{-- Тип товара --}}
 	            <div>
 	                <label class="block text-sm text-gray-600 mb-1">Тип товара</label>
 	                <select name="tip_tovara" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
@@ -56,7 +105,6 @@
 	                </select>
 	            </div>
 
-	            {{-- Поставщик --}}
 	            <div>
 	                <label class="block text-sm text-gray-600 mb-1">Поставщик</label>
 	                <select name="postavshik" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
@@ -69,7 +117,6 @@
                 </select>
             </div>
 
-	            {{-- Производитель --}}
 	            <div>
 	                <label class="block text-sm text-gray-600 mb-1">Производитель</label>
 	                <select name="proizvoditel" class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
@@ -84,7 +131,7 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {{-- Цена от --}}
+
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Цена от</label>
                 <input type="number"
@@ -95,7 +142,6 @@
                     class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-orange-500 focus:ring focus:ring-orange-200">
             </div>
 
-            {{-- Цена до --}}
             <div>
                 <label class="block text-sm text-gray-600 mb-1">Цена до</label>
                 <input type="number"
@@ -139,14 +185,14 @@
             <tbody class="divide-y divide-gray-100">
                 @foreach ($products as $product)
                 <tr class="hover:bg-gray-50">
-                    {{-- Фото товара --}}
+
                     <td class="px-4 py-3">
                         <div class="h-14 w-14 rounded-lg bg-gray-100 overflow-hidden">
                             <img
                                 src="{{ $product->thumb_url }}"
                                 alt="{{ $product->naimenovanie }}"
-                                width="56" height="56" {{-- резервируем место, снижает CLS --}}
-                                loading="lazy" decoding="async" {{-- быстрее/ленивее --}}
+                                width="56" height="56"
+                                loading="lazy" decoding="async"
                                 class="block h-14 w-14 object-cover">
                         </div>
                     </td>

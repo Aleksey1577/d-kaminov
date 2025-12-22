@@ -23,7 +23,7 @@ class HomeController extends Controller
             ->get();
 
         return view('home', compact(
-            'seoData', 
+            'seoData',
             'categories',
             'cartQuantity',
             'compareCount',

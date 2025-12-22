@@ -10,7 +10,6 @@
                 <p class="text-sm text-gray-500">Список заказов с быстрым фильтром по статусу</p>
             </div>
 
-            <!-- Фильтр по статусу -->
             <form method="GET" action="{{ route('admin.orders') }}" class="flex items-center gap-2">
                 <label for="status" class="text-sm text-gray-600">Статус:</label>
                 <select name="status" id="status" onchange="this.form.submit()" class="border rounded-md px-3 py-2 text-sm">

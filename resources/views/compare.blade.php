@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
 @section('title', 'Сравнение')
-@section('seo_title', 'Сравнение товаров | D-Kaminov')
-@section('seo_description', 'Сравнение характеристик каминов, печей и аксессуаров, чтобы выбрать подходящую модель в D-Kaminov.')
+@section('seo_title', 'Сравнение товаров | Дом каминов')
+@section('seo_description', 'Сравнение характеристик каминов, печей и аксессуаров, чтобы выбрать подходящую модель в Дом каминов.')
+@section('seo_robots', 'noindex,follow')
 
 @section('content')
 @php
@@ -203,56 +204,104 @@
 
     @if($hasProducts)
         <style>
+            .cmp-table {
+                border-collapse: separate;
+                border-spacing: 0;
+                table-layout: fixed;
+            }
+            .cmp-col-label {
+                width: 10rem;
+                min-width: 10rem;
+                max-width: 10rem;
+            }
+            .cmp-sticky-head {
+                position: sticky;
+                top: var(--cmp-sticky-top, 0px);
+                z-index: 6;
+                background: #fff;
+            }
+            .cmp-head-scroll {
+                overflow-x: auto;
+                overflow-y: visible;
+                scrollbar-width: none;
+            }
+            .cmp-head-scroll::-webkit-scrollbar { display: none; }
+            .cmp-body-scroll {
+                overflow-x: auto;
+                overflow-y: visible;
+            }
+            .cmp-sticky-first thead th {
+                background: rgba(255, 251, 235, 0.6);
+            }
             .cmp-sticky-first thead th:first-child,
             .cmp-sticky-first tbody td:first-child {
                 position: sticky;
                 left: 0;
-                z-index: 1;
-                background: #fff;
+                z-index: 2;
             }
-            .cmp-sticky-first thead th:first-child { z-index: 2; }
+            .cmp-sticky-first thead th:first-child { z-index: 4; }
         </style>
 
-        <div class="surface overflow-x-auto p-0">
-            <table class="w-full border-collapse min-w-[1000px] cmp-sticky-first" id="compareTable">
-                <thead>
-                    <tr class="bg-amber-50/60 text-left text-sm text-slate-700">
-                        <th class="border-b border-gray-100 p-4 font-semibold w-64">Характеристика</th>
-                        @foreach($products as $product)
-                            <th class="border-b border-gray-100 p-4 align-bottom">
-                                <div class="flex items-start gap-3">
-                                    <div class="flex-1">
-                                        <div class="font-semibold text-slate-900">
-                                            {{ $product->naimenovanie }}
-                                        </div>
-                                        @php $priceCell = $product->display_price ?? $product->price ?? null; @endphp
-                                        @if(!is_null($priceCell))
-                                            <div class="mt-1 text-slate-600 text-sm">
-                                                {{ $fmtMoney($priceCell) }}
-                                            </div>
-                                        @endif
-                                        @if(!empty($product->v_nalichii_na_sklade))
-                                            <div class="mt-1 text-xs">
-                                                @if($product->v_nalichii_na_sklade === 'Да')
-                                                    <span class="inline-block px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">В наличии</span>
-                                                @elseif($product->v_nalichii_na_sklade === 'Нет')
-                                                    <span class="inline-block px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Под заказ</span>
+        <div class="surface p-0">
+            <div class="cmp-sticky-head">
+                <div class="cmp-head-scroll" id="compareHeaderScroll">
+                    <table class="w-full min-w-[1000px] cmp-table cmp-sticky-first">
+                        <colgroup>
+                            <col class="cmp-col-label">
+                            @foreach($products as $product)
+                                <col>
+                            @endforeach
+                        </colgroup>
+                        <thead>
+                            <tr class="bg-amber-50/60 text-left text-sm text-slate-700">
+                                <th class="border-b border-gray-100 p-4 font-semibold">Характеристика</th>
+                                @foreach($products as $product)
+                                    <th class="border-b border-gray-100 p-4 align-top">
+                                        <div class="flex items-start gap-3">
+                                            <div class="flex-1">
+                                                <a href="{{ route('product', $product->slug) }}"
+                                                   class="block font-semibold text-slate-900 hover:text-orange">
+                                                    {{ $product->naimenovanie }}
+                                                </a>
+                                                @php $priceCell = $product->display_price ?? $product->price ?? null; @endphp
+                                                @if(!is_null($priceCell))
+                                                    <div class="mt-1 text-slate-600 text-sm">
+                                                        {{ $fmtMoney($priceCell) }}
+                                                    </div>
+                                                @endif
+                                                @if(!empty($product->v_nalichii_na_sklade))
+                                                    <div class="mt-1 text-xs">
+                                                        @if($product->v_nalichii_na_sklade === 'Да')
+                                                            <span class="inline-block px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">В наличии</span>
+                                                        @elseif($product->v_nalichii_na_sklade === 'Нет')
+                                                            <span class="inline-block px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Под заказ</span>
+                                                        @endif
+                                                    </div>
                                                 @endif
                                             </div>
-                                        @endif
-                                    </div>
-                                    <form action="{{ route('compare.remove', $product->product_id) }}" method="POST"
-                                          onsubmit="sessionStorage.setItem('scrollPos', window.pageYOffset); return true;">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-700 text-sm">Убрать</button>
-                                    </form>
-                                </div>
-                            </th>
-                        @endforeach
-                    </tr>
-                </thead>
+                                            <form action="{{ route('compare.remove', $product->product_id) }}" method="POST"
+                                                  onsubmit="sessionStorage.setItem('scrollPos', window.pageYOffset); return true;">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-700 text-sm">Убрать</button>
+                                            </form>
+                                        </div>
+                                    </th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
 
-                <tbody class="text-sm">
+            <div class="cmp-body-scroll" id="compareBodyScroll">
+                <table class="w-full min-w-[1000px] cmp-table cmp-sticky-first" id="compareTable">
+                    <colgroup>
+                        <col class="cmp-col-label">
+                        @foreach($products as $product)
+                            <col>
+                        @endforeach
+                    </colgroup>
+                    <tbody class="text-sm">
                     @php $hasAnyImage = $products->contains(fn($p) => !empty($p->image_url)); @endphp
                     @if($hasAnyImage)
                         <tr class="cmp-row" data-same="0">
@@ -304,6 +353,7 @@
                 </tbody>
             </table>
         </div>
+    </div>
     @else
         <div class="surface p-6 text-center">
             <p class="text-slate-600 mb-4">В сравнении пока нет товаров.</p>
@@ -315,6 +365,12 @@
 <script>
     // восстановление позиции скролла после удаления
     document.addEventListener('DOMContentLoaded', () => {
+        const updateStickyTop = () => {
+            const header = document.querySelector('header');
+            const height = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+            document.documentElement.style.setProperty('--cmp-sticky-top', `${height}px`);
+        };
+
         const pos = sessionStorage.getItem('scrollPos');
         if (pos) { window.scrollTo({ top: +pos, behavior: 'instant' }); sessionStorage.removeItem('scrollPos'); }
 
@@ -335,6 +391,26 @@
             toggle.addEventListener('change', applyFilter);
             applyFilter();
         }
+
+        const headerScroll = document.getElementById('compareHeaderScroll');
+        const bodyScroll = document.getElementById('compareBodyScroll');
+
+        if (headerScroll && bodyScroll) {
+            let isSyncing = false;
+            const syncScroll = (source, target) => {
+                if (isSyncing) return;
+                isSyncing = true;
+                target.scrollLeft = source.scrollLeft;
+                isSyncing = false;
+            };
+
+            headerScroll.addEventListener('scroll', () => syncScroll(headerScroll, bodyScroll));
+            bodyScroll.addEventListener('scroll', () => syncScroll(bodyScroll, headerScroll));
+            headerScroll.scrollLeft = bodyScroll.scrollLeft;
+        }
+
+        updateStickyTop();
+        window.addEventListener('resize', updateStickyTop);
     });
 </script>
 @endsection

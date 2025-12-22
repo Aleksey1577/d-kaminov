@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
 @section('title', 'Избранное')
-@section('seo_title', 'Избранные товары | D-Kaminov')
-@section('seo_description', 'Сохранённые избранные камины, печи и аксессуары — вернитесь и оформите заказ в D-Kaminov.')
+@section('seo_title', 'Избранные товары | Дом каминов')
+@section('seo_description', 'Сохранённые избранные камины, печи и аксессуары — вернитесь и оформите заказ в Дом каминов.')
+@section('seo_robots', 'noindex,follow')
 
 @section('content')
 @php
@@ -25,7 +26,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($products as $product)
                 <div class="relative surface overflow-hidden">
-                    {{-- Кнопка удалить из избранного --}}
+
                     <form action="{{ route('favorites.remove', $product->product_id) }}" method="POST"
                           onsubmit="sessionStorage.setItem('scrollPos', window.pageYOffset); return true;"
                           class="absolute top-3 right-3 z-10">
@@ -42,7 +43,6 @@
                         </button>
                     </form>
 
-                    {{-- Ваша карточка товара --}}
                     <x-product-card :product="$product" />
                 </div>
             @endforeach

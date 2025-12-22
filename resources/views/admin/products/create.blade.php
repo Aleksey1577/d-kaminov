@@ -1,4 +1,3 @@
-{{-- resources/views/admin/products/create.blade.php --}}
 @extends('layouts.admin')
 
 @section('title', 'Добавить товар')
@@ -18,16 +17,14 @@
     <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
         @csrf
 
-        {{-- 1. Верх: слева Основная информация, справа Основные характеристики --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {{-- Основная информация --}}
+
             <section class="border border-gray-100 rounded-lg p-4">
                 <h2 class="text-base font-semibold mb-3">Основная информация</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @php $tip = old('tip_stroki', 'product'); @endphp
 
-                    {{-- tip_stroki --}}
                     <div class="md:col-span-2">
                         <label class="block text-gray-700 mb-1 text-sm font-medium" for="tip_stroki">
                             Тип строки (tip_stroki)
@@ -42,7 +39,6 @@
                         </p>
                     </div>
 
-                    {{-- Название артикула / товара --}}
                     @php
                     $simpleFields = [
                     'naimenovanie_artikula' => 'Название артикула (варианта)',
@@ -64,7 +60,6 @@
                     </div>
                     @endforeach
 
-                    {{-- Цена --}}
                     <div>
                         <label class="block text-gray-700 mb-1 text-sm font-medium" for="price">Цена*</label>
                         <input type="number"
@@ -77,7 +72,6 @@
                             class="w-full border rounded-md p-2.5 text-sm">
                     </div>
 
-                    {{-- Валюта --}}
                     @php $currentCurrency = old('valyuta'); @endphp
                     <div>
                         <label class="block text-gray-700 mb-1 text-sm font-medium" for="valyuta">Валюта</label>
@@ -99,7 +93,6 @@
                         @endif
                     </div>
 
-                    {{-- Категория --}}
                     @php $currentCategory = old('kategoriya'); @endphp
                     <div>
                         <label class="block text-gray-700 mb-1 text-sm font-medium" for="kategoriya">Категория*</label>
@@ -122,7 +115,6 @@
                         @endif
                     </div>
 
-                    {{-- Тип товара (просто список всех типов) --}}
                     @php
                     $currentType = old('tip_tovara');
                     @endphp
@@ -138,8 +130,6 @@
                         </select>
                     </div>
 
-
-                    {{-- Наличие --}}
                     @php $stock = old('v_nalichii_na_sklade', 'Да'); @endphp
                     <div>
                         <label class="block text-gray-700 mb-1 text-sm font-medium" for="v_nalichii_na_sklade">
@@ -151,7 +141,6 @@
                         </select>
                     </div>
 
-                    {{-- Поставщик / Производитель / Страна --}}
                     @php
                     $dropdowns = [
                     'postavshik' => ['label' => 'Поставщик', 'list' => $suppliers ?? []],
@@ -185,7 +174,6 @@
                     </div>
                     @endforeach
 
-                    {{-- Описание --}}
                     <div class="md:col-span-2">
                         <label class="block text-gray-700 mb-1 text-sm font-medium" for="opisanije">Описание</label>
                         <textarea name="opisanije" id="opisanije" rows="3"
@@ -194,7 +182,6 @@
                 </div>
             </section>
 
-            {{-- Основные характеристики --}}
             <section class="border border-gray-100 rounded-lg p-4">
                 <h2 class="text-base font-semibold mb-3">Основные характеристики</h2>
 
@@ -230,7 +217,6 @@
             </section>
         </div>
 
-        {{-- 2. Дополнительные характеристики (со скроллом) --}}
         @php
         $extraFields = [
         'tolshchina_materiala','gabarity','toplivo','kolichestvo_konteynerov','obshchaya_liniya_ognya',
@@ -278,7 +264,6 @@
             </div>
         </section>
 
-        {{-- 3. Картинки (компактно: превью слева, поля справа, 2 колонки) --}}
         <section class="border border-gray-100 rounded-lg p-4 space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -287,17 +272,23 @@
                         Короткий превью-ряд снизу, детали — по клику.
                     </p>
                 </div>
-                <button type="button"
-                    data-gallery-toggle
-                    class="text-sm inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition">
-                    <span class="toggle-text">Показать блок</span>
-                    <span aria-hidden="true">▼</span>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button type="button"
+                            data-add-image
+                            class="text-sm inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-amber-200 bg-amber-50 hover:bg-amber-100 transition">
+                        Добавить фото
+                    </button>
+                    <button type="button"
+                            data-gallery-toggle
+                            class="text-sm inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition">
+                        <span class="toggle-text">Показать блок</span>
+                        <span aria-hidden="true">▼</span>
+                    </button>
+                </div>
             </div>
 
             <div id="gallery-summary" class="flex items-center gap-2 overflow-x-auto py-1"></div>
 
-            {{-- Массовая загрузка + поля (скрыты по умолчанию) --}}
             <div class="space-y-4 hidden" data-gallery-body>
                 <div class="border border-dashed border-gray-300 rounded-md p-3 bg-gray-50">
                     <label class="block text-gray-700 mb-1 text-sm font-medium">
@@ -333,10 +324,20 @@
                     $urlVal = old($urlField);
                     @endphp
 
-                    <div class="draggable-row flex gap-3 bg-gray-50 rounded-md p-3 items-stretch"
+                    @php
+                        $previewSrc = null;
+                        if ($urlVal) {
+                            $previewSrc = \Illuminate\Support\Str::startsWith($urlVal, ['http://', 'https://', '//', 'data:'])
+                                ? $urlVal
+                                : asset(ltrim($urlVal, '/'));
+                        }
+                    @endphp
+
+                    <div class="draggable-row flex gap-3 bg-gray-50 rounded-md p-3 items-stretch {{ $urlVal ? '' : 'hidden' }}"
                         draggable="true"
-                        data-field="{{ $urlField }}">
-                        {{-- превью + хэндл --}}
+                        data-field="{{ $urlField }}"
+                        data-image-card="{{ $urlField }}">
+
                         <div class="w-28 flex flex-col items-center">
                             <button type="button"
                                 class="text-gray-400 text-lg cursor-move"
@@ -346,7 +347,7 @@
 
                             <div class="mt-2 w-24 h-24 border rounded bg-white flex items-center justify-center overflow-hidden">
                                 @if($urlVal)
-                                <img src="{{ $urlVal }}"
+                                <img src="{{ $previewSrc }}"
                                     alt="{{ $label }}"
                                     class="w-full h-full object-cover"
                                     data-preview="{{ $urlField }}">
@@ -361,9 +362,13 @@
                                 @endif
                             </div>
                             <input type="hidden" name="image_positions[]" value="{{ $urlField }}">
+                            <button type="button"
+                                class="mt-2 text-xs text-red-600 hover:text-red-700"
+                                data-remove-image="{{ $urlField }}">
+                                Удалить
+                            </button>
                         </div>
 
-                        {{-- поля (файл + URL) --}}
                         <div class="flex-1 space-y-3">
                             <div>
                                 <label class="block text-gray-700 mb-1 text-sm font-medium">
@@ -418,7 +423,6 @@
     </form>
 </div>
 
-{{-- данные для JS (для логики "категория → тип товара") --}}
 <div id="js-types-by-category"
     data-json='@json($typesByCategory ?? [])'
     class="hidden"></div>
@@ -471,10 +475,29 @@
             previews[key] = img;
         });
 
+        const cardList = Array.from(document.querySelectorAll('[data-image-card]'));
+        const cardByKey = {};
+        cardList.forEach(card => {
+            const key = card.dataset.imageCard;
+            if (key) cardByKey[key] = card;
+        });
+
+        const fieldMap = {};
+        document.querySelectorAll('[data-preview-target]').forEach(input => {
+            const key = input.dataset.previewTarget;
+            if (!key) return;
+            if (!fieldMap[key]) fieldMap[key] = {};
+            if (input.type === 'file') fieldMap[key].fileInput = input;
+            else fieldMap[key].urlInput = input;
+        });
+
         /* ---------- Компактная шапка галереи ---------- */
         const galleryBody = document.querySelector('[data-gallery-body]');
         const galleryToggle = document.querySelector('[data-gallery-toggle]');
         const gallerySummary = document.getElementById('gallery-summary');
+        const addImageButton = document.querySelector('[data-add-image]');
+        let toggleText = null;
+        let toggleArrow = null;
 
         function renderGallerySummary() {
             if (!gallerySummary) return;
@@ -507,12 +530,48 @@
         }
 
         if (galleryToggle && galleryBody) {
-            const textEl = galleryToggle.querySelector('.toggle-text');
-            const arrowEl = galleryToggle.querySelector('[aria-hidden]');
+            toggleText = galleryToggle.querySelector('.toggle-text');
+            toggleArrow = galleryToggle.querySelector('[aria-hidden]');
             galleryToggle.addEventListener('click', () => {
                 const hidden = galleryBody.classList.toggle('hidden');
-                if (textEl) textEl.textContent = hidden ? 'Показать блок' : 'Скрыть блок';
-                if (arrowEl) arrowEl.textContent = hidden ? '▼' : '▲';
+                if (toggleText) toggleText.textContent = hidden ? 'Показать блок' : 'Скрыть блок';
+                if (toggleArrow) toggleArrow.textContent = hidden ? '▼' : '▲';
+            });
+        }
+
+        function setGalleryOpen(open) {
+            if (!galleryBody) return;
+            galleryBody.classList.toggle('hidden', !open);
+            if (toggleText) toggleText.textContent = open ? 'Скрыть блок' : 'Показать блок';
+            if (toggleArrow) toggleArrow.textContent = open ? '▲' : '▼';
+        }
+
+        function setCardVisible(key, visible) {
+            const card = cardByKey[key];
+            if (!card) return;
+            if (visible) card.classList.remove('hidden');
+            else card.classList.add('hidden');
+        }
+
+        function updateAddButtonState() {
+            if (!addImageButton) return;
+            const hasHidden = cardList.some(card => card.classList.contains('hidden'));
+            addImageButton.disabled = !hasHidden;
+            addImageButton.classList.toggle('opacity-50', !hasHidden);
+            addImageButton.classList.toggle('cursor-not-allowed', !hasHidden);
+        }
+
+        if (addImageButton) {
+            addImageButton.addEventListener('click', () => {
+                const nextCard = cardList.find(card => card.classList.contains('hidden'));
+                if (!nextCard) return;
+                setGalleryOpen(true);
+                nextCard.classList.remove('hidden');
+                const key = nextCard.dataset.imageCard;
+                const inputs = fieldMap[key] || {};
+                if (inputs.urlInput) inputs.urlInput.focus();
+                else if (inputs.fileInput) inputs.fileInput.focus();
+                updateAddButtonState();
             });
         }
 
@@ -531,13 +590,14 @@
             }
 
             let src = url.trim();
-            if (!src.startsWith('http') && !src.startsWith('data:')) {
+            if (!src.startsWith('http') && !src.startsWith('data:') && !src.startsWith('//')) {
                 src = src.charAt(0) === '/' ? src : '/' + src;
             }
 
             img.src = src;
             img.classList.remove('hidden');
             if (emptyText) emptyText.classList.add('hidden');
+            setCardVisible(key, true);
         }
 
         document.querySelectorAll('[data-preview-target]').forEach(input => {
@@ -559,18 +619,39 @@
                         img.src = e.target.result;
                         img.classList.remove('hidden');
                         if (emptyText) emptyText.classList.add('hidden');
+                        setCardVisible(key, true);
                         renderGallerySummary();
+                        updateAddButtonState();
                     };
                     reader.readAsDataURL(file);
                 });
             } else {
-                const handler = () => {
+                const handler = (event) => {
                     updatePreviewFromUrl(key, input.value);
                     renderGallerySummary();
+                    const inputs = fieldMap[key] || {};
+                    const hasFile = inputs.fileInput && inputs.fileInput.files && inputs.fileInput.files.length;
+                    if (event.type === 'change' && !input.value.trim() && !hasFile) {
+                        setCardVisible(key, false);
+                    }
+                    updateAddButtonState();
                 };
                 input.addEventListener('input', handler);
                 input.addEventListener('change', handler);
             }
+        });
+
+        document.querySelectorAll('[data-remove-image]').forEach(button => {
+            button.addEventListener('click', () => {
+                const key = button.dataset.removeImage;
+                const inputs = fieldMap[key] || {};
+                if (inputs.urlInput) inputs.urlInput.value = '';
+                if (inputs.fileInput) inputs.fileInput.value = '';
+                updatePreviewFromUrl(key, '');
+                setCardVisible(key, false);
+                renderGallerySummary();
+                updateAddButtonState();
+            });
         });
 
         // Инициализируем превью по существующим old() URL
@@ -584,6 +665,7 @@
         });
 
         renderGallerySummary();
+        updateAddButtonState();
 
         /* ---------- Категория → Тип товара (общая логика для create/edit) ---------- */
         const typesDiv = document.getElementById('js-types-by-category');

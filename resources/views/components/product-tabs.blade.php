@@ -1,5 +1,3 @@
-{{-- resources/views/components/product-tabs.blade.php --}}
-
 <div
     x-data="{
         tab: 'description',
@@ -16,7 +14,7 @@
     id="product-tabs"
     class="mt-6 sm:mt-8">
     <span id="characteristics-anchor" class="block -mt-24 pt-24" aria-hidden="true"></span>
-    {{-- Табы --}}
+
     <div class="-mx-4 px-4 sm:mx-0 sm:px-0 flex mb-4 sm:mb-6 border-b border-amber-100 overflow-x-auto">
         <button
             @click="tab = 'description'"
@@ -59,13 +57,11 @@
         </button>
     </div>
 
-    {{-- Описание --}}
     <div x-show="tab === 'description'" x-transition
          class="text-gray-700 prose prose-sm max-w-none">
         {!! $product->opisanije !!}
     </div>
 
-    {{-- Характеристики --}}
     <div x-show="tab === 'characteristics'" x-transition
          class="mt-4 text-gray-700">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -82,7 +78,6 @@
         </div>
     </div>
 
-    {{-- Доставка --}}
     <div x-show="tab === 'delivery'" x-transition
          class="mt-4 text-gray-700">
         <h3 class="text-lg font-semibold mb-3">Способы доставки</h3>
@@ -133,7 +128,6 @@
         </div>
     </div>
 
-    {{-- Оплата --}}
     <div x-show="tab === 'payment'" x-transition
          class="mt-4 text-gray-700">
         <h3 class="text-lg font-semibold mb-3">Способы оплаты</h3>

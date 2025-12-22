@@ -66,9 +66,6 @@ class StaticPageController extends Controller
             'message' => 'nullable|string|max:1000',
         ]);
 
-        // Здесь можно добавить логику, например, сохранение в БД или отправку email
-        // Пример: \App\Models\CallbackRequest::create($data);
-
         return redirect()->back()->with('success', 'Ваш запрос отправлен!');
     }
 }
