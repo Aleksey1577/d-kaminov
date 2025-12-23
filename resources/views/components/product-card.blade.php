@@ -1,7 +1,7 @@
 <div class="surface overflow-hidden flex flex-col h-full transition-transform duration-200 hover:-translate-y-0.5">
 
     <a href="{{ route('product', $product->slug) }}" class="block flex-grow">
-        <div class="relative w-full h-64 bg-white flex items-center justify-center">
+        <div class="relative w-full h-40 sm:h-52 md:h-64 bg-white flex items-center justify-center">
             <img
                 src="{{ $product->image_url ?: asset('assets/placeholder.png') }}"
                 alt="{{ $product->naimenovanie }}"
@@ -11,10 +11,10 @@
         </div>
     </a>
 
-    <div class="p-5 flex flex-col gap-3">
+    <div class="p-3 sm:p-4 md:p-5 flex flex-col gap-2 sm:gap-3">
 
         <a href="{{ route('product', $product->slug) }}" class="block">
-            <h3 class="text-lg font-semibold leading-tight text-slate-900 hover:text-orange line-clamp-2">
+            <h3 class="text-sm sm:text-base md:text-lg font-semibold leading-tight text-slate-900 hover:text-orange line-clamp-2">
                 {{ $product->naimenovanie }}
             </h3>
         </a>
@@ -30,18 +30,31 @@
             @if (in_array($product->product_id, session('compare', [])))
             @method('DELETE')
             @endif
-            <label class="inline-flex items-center gap-2 text-sm text-slate-600">
-                <input type="checkbox"
-                    class="h-4 w-4 rounded border-amber-200 text-orange focus:ring-orange"
-                    name="compare"
-                    {{ in_array($product->product_id, session('compare', [])) ? 'checked' : '' }}>
-                <span>Сравнить</span>
-            </label>
+            <div class="flex items-center justify-between gap-3">
+                <label class="inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-600">
+                    <input type="checkbox"
+                        class="h-3.5 w-3.5 sm:h-4 sm:w-4 rounded border-amber-200 text-orange focus:ring-orange"
+                        name="compare"
+                        {{ in_array($product->product_id, session('compare', [])) ? 'checked' : '' }}>
+                    <span>Сравнить</span>
+                </label>
+                @if ($product->v_nalichii_na_sklade === 'Да')
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
+                        <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                        В наличии
+                    </span>
+                @else
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-700">
+                        <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                        Под заказ
+                    </span>
+                @endif
+            </div>
         </form>
 
-        <div class="flex items-center justify-between pt-3 border-t border-amber-100">
+        <div class="flex items-center justify-between gap-2 pt-2 sm:pt-3 border-t border-amber-100">
 
-            <span class="text-2xl font-bold text-slate-900">
+            <span class="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 whitespace-nowrap">
                 {{ number_format(floor($product->display_price ?? 0), 0, '', '') }} ₽
             </span>
 
@@ -60,9 +73,9 @@
                     @endif
                     <button
                         type="submit"
-                        class="favorites-button p-2 rounded-xl border transition {{ in_array($product->product_id, session('favorites', [])) ? 'border-red-200 bg-red-50 text-red-500' : 'border-amber-200 bg-white/80 text-slate-700 hover:border-orange hover:text-orange' }}"
+                        class="favorites-button p-1.5 sm:p-2 rounded-lg sm:rounded-xl border transition {{ in_array($product->product_id, session('favorites', [])) ? 'border-red-200 bg-red-50 text-red-500' : 'border-amber-200 bg-white/80 text-slate-700 hover:border-orange hover:text-orange' }}"
                         title="{{ in_array($product->product_id, session('favorites', [])) ? 'Удалить из избранного' : 'Добавить в избранное' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="favorites-icon h-5 w-5" fill="{{ in_array($product->product_id, session('favorites', [])) ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="favorites-icon h-4 w-4 sm:h-5 sm:w-5" fill="{{ in_array($product->product_id, session('favorites', [])) ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                     </button>
@@ -74,9 +87,9 @@
                     @csrf
                     <button
                         type="submit"
-                        class="btn-primary"
+                        class="btn-primary p-2 sm:px-4 sm:py-2.5"
                         title="Добавить в корзину">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                     </button>

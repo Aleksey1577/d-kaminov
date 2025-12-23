@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
-@section('title', $category ? 'Купить ' . $category . ' в Дом каминов' : 'Каталог Дом каминов')
-@section('seo_title', $category ? 'Купить ' . $category . ' в Дом каминов' : 'Каталог Дом каминов — камины и печи')
+@section('title', $category ? 'Купить ' . $category . ' в Самаре' : 'Каталог Дом каминов')
+@section('seo_title', $category ? 'Купить ' . $category . ' в Самаре' : 'Каталог Дом каминов — камины и печи')
 @section('seo_description', $category
-    ? 'Купить ' . $category . ' в Дом каминов в Самаре и с доставкой по России. Цены, наличие, фильтры и характеристики.'
+    ? 'Купить ' . $category . ' в Самаре и с доставкой по России. Цены, наличие, фильтры и характеристики.'
     : 'Каталог Дом каминов: камины, топки, печи и аксессуары. Фильтры по цене, бренду и наличию, доставка и монтаж под ключ.'
 )
 @section('seo_keywords', $category
@@ -25,7 +25,7 @@
     <div class="space-y-2">
         <div class="eyebrow">{{ $category ? 'Категория' : 'Каталог' }}</div>
         <h1 class="section-title">
-            {{ $category ? 'Купить ' . $category . ' в Дом каминов' : 'Каталог Дом каминов' }}
+            {{ $category ? 'Купить ' . $category . ' в Самаре' : 'Каталог Дом каминов' }}
         </h1>
         <p class="section-lead text-base">
             Актуальные цены, наличие и удобные фильтры по бренду, стоимости и характеристикам.
@@ -104,7 +104,7 @@
         ])
 
         <div class="flex-1">
-            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 @foreach($products as $product)
                     @include('components.product-card', ['product' => $product])
                 @endforeach
